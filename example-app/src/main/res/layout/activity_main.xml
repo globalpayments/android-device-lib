@@ -152,6 +152,30 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/surcharge_pretax_switch" />
 
+            <LinearLayout
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/surcharge_percent_label" />
+
+                <EditText
+                    android:id="@+id/surcharge_custom_edittext"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
+                    android:inputType="numberDecimal"
+                    android:hint="@string/surcharge_percent_hint" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>

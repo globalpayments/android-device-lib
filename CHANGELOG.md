@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.4.5] - 2025-06-10
+ 
+### Added
+- Added option for custom surcharge percentage (between 2% and 3%) to the ConnectionConfig.
+### Changed
+
+### Fixed
+
+
+
 ## [1.4.4] - 2025-01-30
  
 ### Added

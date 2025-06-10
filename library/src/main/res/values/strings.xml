@@ -13,4 +13,6 @@
     <string name="card_no">Card Number</string>
     <string name="month">MM</string>
     <string name="year">YYYY</string>
+
+    <string name="invalid_surcharge_amount">Custom surcharge rate must be a value between 2% and 3%</string>
 </resources>

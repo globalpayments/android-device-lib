@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.heartlandpaymentsystems.library.BuildConfig;
+import com.heartlandpaymentsystems.library.R;
 import com.heartlandpaymentsystems.library.terminals.SafListener;
 import com.heartlandpaymentsystems.library.terminals.UpdateTerminalListener;
 import com.heartlandpaymentsystems.library.terminals.AvailableTerminalVersionsListener;
@@ -92,7 +93,7 @@ public class C2XDevice implements IDevice {
         this.applicationContext = applicationContext;
     }
 
-    public C2XDevice(Context applicationContext, ConnectionConfig connectionConfig) {
+    public C2XDevice(Context applicationContext, ConnectionConfig connectionConfig) throws Exception {
         this.applicationContext = applicationContext;
         this.setConnectionConfig(connectionConfig);
     }
@@ -274,7 +275,7 @@ public class C2XDevice implements IDevice {
         }
     }
 
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
+    public void setConnectionConfig(ConnectionConfig connectionConfig) throws Exception {
         this.connectionConfig = connectionConfig;
 
         LibraryConfigHelper.setDebugMode(connectionConfig.getEnvironment().equals(Environment.TEST));
@@ -286,6 +287,14 @@ public class C2XDevice implements IDevice {
 
         LibraryConfigHelper.setSurchargeEnabled(connectionConfig.isSurchargeEnabled());
         LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
+        if (LibraryConfigHelper.isSurchargeEnabled()) {
+            //can ignore any custom value if surcharge isn't even enabled
+            boolean surchargePercentUpdate =
+                    LibraryConfigHelper.setSurchargePercent(connectionConfig.getSurchargePercent());
+            if (!surchargePercentUpdate) {
+                throw new Exception(applicationContext.getString(R.string.invalid_surcharge_amount));
+            }
+        }
 
         transactionConfig = new TransactionConfiguration();
         transactionConfig.setChipEnabled(true);

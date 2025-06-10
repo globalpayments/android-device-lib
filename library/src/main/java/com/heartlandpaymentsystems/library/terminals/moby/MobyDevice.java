@@ -113,7 +113,7 @@ public class MobyDevice implements IDevice {
      * @param context the context
      * @param config  the config
      */
-    public MobyDevice(Context context, ConnectionConfig config) {
+    public MobyDevice(Context context, ConnectionConfig config) throws Exception {
         this.applicationContext = context;
         this.setConnectionConfig(config);
     }
@@ -123,7 +123,7 @@ public class MobyDevice implements IDevice {
      *
      * @param connectionConfig the connection config
      */
-    public void setConnectionConfig(ConnectionConfig connectionConfig) {
+    public void setConnectionConfig(ConnectionConfig connectionConfig) throws Exception {
         this.connectionConfig = connectionConfig;
 
         LibraryConfigHelper.setDebugMode(connectionConfig.getEnvironment().equals(Environment.TEST));
@@ -135,6 +135,14 @@ public class MobyDevice implements IDevice {
 
         LibraryConfigHelper.setSurchargeEnabled(connectionConfig.isSurchargeEnabled());
         LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
+        if (LibraryConfigHelper.isSurchargeEnabled()) {
+            //can ignore any custom value if surcharge isn't even enabled
+            boolean surchargePercentUpdate =
+                    LibraryConfigHelper.setSurchargePercent(connectionConfig.getSurchargePercent());
+            if (!surchargePercentUpdate) {
+                throw new Exception(applicationContext.getString(R.string.invalid_surcharge_amount));
+            }
+        }
 
         transactionConfig = new TransactionConfiguration();
         transactionConfig.setQuickChipEnabled(true);

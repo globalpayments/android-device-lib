@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -58,6 +59,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private Switch safSwitch;
     private Switch surchargeSwitch;
     private Switch surchargePretaxSwitch;
+    private EditText surchargeCustomPercent;
     private int startCounter = 0;
 
     public static boolean isShowAbout() {
@@ -121,6 +123,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         surchargeSwitch.setOnClickListener(this);
         surchargePretaxSwitch = findViewById(R.id.surcharge_pretax_switch);
         surchargePretaxSwitch.setOnClickListener(this);
+        surchargeCustomPercent = findViewById(R.id.surcharge_custom_edittext);
         about = findViewById(R.id.about_button);
         disconnect = findViewById(R.id.disconnect_button);
         disconnect.setOnClickListener(this);
@@ -220,8 +223,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
                     return;
                 }
-                if (c2XDevice == null) {
-                    c2XDevice = new C2XDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
+                try {
+                    if (c2XDevice == null) {
+                        c2XDevice =
+                                new C2XDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
+                    } else {
+                        c2XDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.BLUETOOTH));
+                    }
+                } catch (Exception e) {
+                    showAlertDialog(getString(R.string.configuration_error), e.getMessage());
+                    return;
                 }
                 Intent connectIntent = new Intent(this, BluetoothActivity.class);
                 connectIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.BLUETOOTH);
@@ -232,8 +243,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
                     return;
                 }
-                if (mobyDevice == null) {
-                    mobyDevice = new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
+                try {
+                    if (mobyDevice == null) {
+                        mobyDevice =
+                                new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
+                    } else {
+                        mobyDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.BLUETOOTH));
+                    }
+                } catch (Exception e) {
+                    showAlertDialog(getString(R.string.configuration_error), e.getMessage());
+                    return;
                 }
                 Intent mobyIntent = new Intent(this, BluetoothActivity.class);
                 mobyIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.BLUETOOTH);
@@ -244,8 +263,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
                     return;
                 }
-                if (mobyDevice == null) {
-                    mobyDevice = new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.USB));
+                try {
+                    if (mobyDevice == null) {
+                        mobyDevice = new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.USB));
+                    } else {
+                        mobyDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.USB));
+                    }
+                } catch (Exception e) {
+                    showAlertDialog(getString(R.string.configuration_error), e.getMessage());
+                    return;
                 }
                 Intent mobyUsbIntent = new Intent(this, BluetoothActivity.class);
                 mobyUsbIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.USB);
@@ -327,8 +353,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         connectionConfig.setSafExpirationInDays(5);
         connectionConfig.setSurchargeEnabled(surchargeSwitch.isChecked());
         connectionConfig.setSurchargePreTax(surchargePretaxSwitch.isChecked());
+        if (!surchargeCustomPercent.getText().toString().isEmpty()) {
+            connectionConfig.setSurchargePercent(getCustomSurchargePercent());
+        }
         connectionConfig.setEnvironment(environmentSwitch.isChecked() ? Environment.PRODUCTION : Environment.TEST);
         return connectionConfig;
+    }
+
+    private float getCustomSurchargePercent() {
+        String customPercent = surchargeCustomPercent.getText().toString();
+        float floatValue;
+        try {
+            floatValue = Float.parseFloat(customPercent);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return floatValue;
     }
 
     /**
