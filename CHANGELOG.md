@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2025-06-24
+ 
+### Added
+
+### Changed
+- Updated package names to be 'globalpayments' instead of 'heartlandpaymentsystems'. Updated maven settings for the libraries.
+### Fixed
+
+
+
 ## [1.4.5] - 2025-06-10
  
 ### Added

@@ -1,27 +1,14 @@
 package com.example.app;
 
-import androidx.appcompat.app.AppCompatActivity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
-import com.heartlandpaymentsystems.library.entities.TransactionDetails;
-import com.heartlandpaymentsystems.library.terminals.IDevice;
-import com.heartlandpaymentsystems.library.terminals.TransactionListener;
-import com.heartlandpaymentsystems.library.terminals.entities.CardholderInteractionRequest;
-import com.heartlandpaymentsystems.library.terminals.entities.CardholderInteractionResult;
-import com.heartlandpaymentsystems.library.terminals.entities.TerminalResponse;
-import com.heartlandpaymentsystems.library.terminals.enums.TransactionStatus;
-import com.heartlandpaymentsystems.library.terminals.transactions.CreditAdjustBuilder;
-import com.heartlandpaymentsystems.library.terminals.transactions.CreditAuthBuilder;
+import com.globalpayments.library.entities.TransactionDetails;
+import com.globalpayments.library.terminals.IDevice;
+import com.globalpayments.library.terminals.transactions.CreditAuthBuilder;
 import java.math.BigDecimal;
-import static com.example.app.Dialogs.hideProgress;
 import static com.example.app.Dialogs.showProgress;
 
 public class CreditAuthActivity extends BaseTransactionActivity {

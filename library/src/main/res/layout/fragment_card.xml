@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="15dp"
     android:orientation="vertical"
-    tools:context=".CardFragment">
+    tools:context="com.globalpayments.library.CardFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/card_no_layout"

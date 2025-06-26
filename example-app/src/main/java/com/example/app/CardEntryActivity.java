@@ -3,37 +3,32 @@ package com.example.app;
 import static com.example.app.Dialogs.hideProgress;
 import static com.example.app.Dialogs.showProgress;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.heartlandpaymentsystems.library.CardFragmentInteractionListener;
-import com.heartlandpaymentsystems.library.controller.TokenService;
-import com.heartlandpaymentsystems.library.entities.Card;
-import com.heartlandpaymentsystems.library.entities.Token;
-import com.heartlandpaymentsystems.library.terminals.IDevice;
-import com.heartlandpaymentsystems.library.terminals.TransactionListener;
-import com.heartlandpaymentsystems.library.terminals.enums.ErrorType;
-import com.heartlandpaymentsystems.library.terminals.transactions.CreditSaleBuilder;
-import com.heartlandpaymentsystems.library.terminals.entities.CardholderInteractionRequest;
-import com.heartlandpaymentsystems.library.terminals.entities.CardholderInteractionResult;
-import com.heartlandpaymentsystems.library.terminals.entities.TerminalResponse;
-import com.heartlandpaymentsystems.library.terminals.enums.TransactionStatus;
+import com.globalpayments.library.CardFragmentInteractionListener;
+import com.globalpayments.library.controller.TokenService;
+import com.globalpayments.library.entities.Card;
+import com.globalpayments.library.entities.Token;
+import com.globalpayments.library.terminals.IDevice;
+import com.globalpayments.library.terminals.TransactionListener;
+import com.globalpayments.library.terminals.enums.ErrorType;
+import com.globalpayments.library.terminals.transactions.CreditSaleBuilder;
+import com.globalpayments.library.terminals.entities.CardholderInteractionRequest;
+import com.globalpayments.library.terminals.entities.CardholderInteractionResult;
+import com.globalpayments.library.terminals.entities.TerminalResponse;
+import com.globalpayments.library.terminals.enums.TransactionStatus;
 
 import java.math.BigDecimal;
 
@@ -61,11 +56,11 @@ public class CardEntryActivity extends BaseActivity implements CardFragmentInter
 
         creditSaleManualButton = findViewById(R.id.creditsale_manual_button);
         resultTextView = findViewById(R.id.tokenizeResult);
-        final EditText cardNo = findViewById(com.heartlandpaymentsystems.library.R.id.card_no_edt);
-        final EditText cardExpDate = findViewById(com.heartlandpaymentsystems.library.R.id.card_exp_date_edt);
-        final EditText cardExpYear = findViewById(com.heartlandpaymentsystems.library.R.id.card_exp_yr_edt);
-        final EditText cardCvv = findViewById(com.heartlandpaymentsystems.library.R.id.card_cvv_edt);
-        final Button submitBtn = findViewById(com.heartlandpaymentsystems.library.R.id.submit);
+        final EditText cardNo = findViewById(com.globalpayments.library.R.id.card_no_edt);
+        final EditText cardExpDate = findViewById(com.globalpayments.library.R.id.card_exp_date_edt);
+        final EditText cardExpYear = findViewById(com.globalpayments.library.R.id.card_exp_yr_edt);
+        final EditText cardCvv = findViewById(com.globalpayments.library.R.id.card_cvv_edt);
+        final Button submitBtn = findViewById(com.globalpayments.library.R.id.submit);
 
         findViewById(R.id.creditsale_manual_button).setOnClickListener(this);
 
@@ -155,8 +150,8 @@ public class CardEntryActivity extends BaseActivity implements CardFragmentInter
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(this, getString(com.heartlandpaymentsystems.library.R.string.loading_msg),
-                    getString(com.heartlandpaymentsystems.library.R.string.tokenizing));
+            mProgressDialog = ProgressDialog.show(this, getString(com.globalpayments.library.R.string.loading_msg),
+                    getString(com.globalpayments.library.R.string.tokenizing));
             mProgressDialog.setCancelable(false);
         } else {
             mProgressDialog.show();

@@ -12,13 +12,13 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import com.heartlandpaymentsystems.library.terminals.ConnectionConfig;
-import com.heartlandpaymentsystems.library.terminals.c2x.C2XDevice;
-import com.heartlandpaymentsystems.library.terminals.enums.ConnectionMode;
-import com.heartlandpaymentsystems.library.terminals.enums.Environment;
-import com.heartlandpaymentsystems.library.terminals.moby.MobyDevice;
-import com.heartlandpaymentsystems.library.utilities.PermissionHelper;
-import com.heartlandpaymentsystems.library.utilities.PermissionHelper.PermissionsCallBack;
+import com.globalpayments.library.terminals.ConnectionConfig;
+import com.globalpayments.library.terminals.c2x.C2XDevice;
+import com.globalpayments.library.terminals.enums.ConnectionMode;
+import com.globalpayments.library.terminals.enums.Environment;
+import com.globalpayments.library.terminals.moby.MobyDevice;
+import com.globalpayments.library.utilities.PermissionHelper;
+import com.globalpayments.library.utilities.PermissionHelper.PermissionsCallBack;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, PermissionsCallBack {
 

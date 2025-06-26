@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.heartlandpaymentsystems.library" >
+    package="com.globalpayments.library" >
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application>
-        <activity android:name="com.heartlandpaymentsystems.library.CardActivity"
+        <activity android:name="com.globalpayments.library.CardActivity"
             android:theme="@style/Theme.AppCompat.Light"></activity>
     </application>
 </manifest>

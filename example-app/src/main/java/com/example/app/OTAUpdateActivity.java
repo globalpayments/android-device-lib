@@ -5,20 +5,16 @@ import static com.example.app.Dialogs.showProgress;
 import static com.example.app.Dialogs.updateProgress;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import com.heartlandpaymentsystems.library.terminals.AvailableTerminalVersionsListener;
-import com.heartlandpaymentsystems.library.terminals.IDevice;
-import com.heartlandpaymentsystems.library.terminals.UpdateTerminalListener;
-import com.heartlandpaymentsystems.library.terminals.enums.TerminalUpdateType;
+import com.globalpayments.library.terminals.AvailableTerminalVersionsListener;
+import com.globalpayments.library.terminals.UpdateTerminalListener;
+import com.globalpayments.library.terminals.enums.TerminalUpdateType;
 
 import java.util.List;
 

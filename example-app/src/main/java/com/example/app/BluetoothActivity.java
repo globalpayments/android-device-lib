@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import com.heartlandpaymentsystems.library.terminals.enums.ConnectionMode;
+import com.globalpayments.library.terminals.enums.ConnectionMode;
 import static com.example.app.Dialogs.showProgress;
 
 public class BluetoothActivity extends BaseActivity implements View.OnClickListener {

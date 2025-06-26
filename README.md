@@ -1,13 +1,13 @@
 
-# Heartland Mobile Android SDK 
+# Global Payments Android Device Library 
 =======================
 
-This Android SDK lets you connect to a C2X, C3X, or Moby 5500 device and process credit card payments. Included is an example application which shows the basics of using the SDK.
+This Android library lets you connect to a C2X, C3X, or Moby 5500 device and process credit card payments. Included is an example application which shows the basics of using the library.
 
 Maven
 -------------
 ```java
-implementation 'com.heartlandpaymentsystems:heartland-android-sdk:1.4.5'
+implementation 'com.heartlandpaymentsystems:android-device-lib:2.0.0'
 ```
 
 Example App

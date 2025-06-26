@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.heartlandpaymentsystems.library.terminals.entities.TerminalResponse;
+import com.globalpayments.library.terminals.entities.TerminalResponse;
 import com.tsys.payments.library.domain.TransactionResponse;
 import java.util.List;
 

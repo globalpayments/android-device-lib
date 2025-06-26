@@ -16,14 +16,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.app.MainActivity.TransactionState;
-import com.heartlandpaymentsystems.library.terminals.DeviceListener;
-import com.heartlandpaymentsystems.library.terminals.IDevice;
-import com.heartlandpaymentsystems.library.terminals.SafListener;
-import com.heartlandpaymentsystems.library.terminals.entities.TerminalInfo;
-import com.heartlandpaymentsystems.library.terminals.entities.TerminalResponse;
-import com.heartlandpaymentsystems.library.terminals.enums.ConnectionMode;
-import com.heartlandpaymentsystems.library.terminals.enums.ErrorType;
-import com.heartlandpaymentsystems.library.utilities.ReceiptHelper;
+import com.globalpayments.library.terminals.DeviceListener;
+import com.globalpayments.library.terminals.IDevice;
+import com.globalpayments.library.terminals.SafListener;
+import com.globalpayments.library.terminals.entities.TerminalInfo;
+import com.globalpayments.library.terminals.entities.TerminalResponse;
+import com.globalpayments.library.terminals.enums.ConnectionMode;
+import com.globalpayments.library.terminals.enums.ErrorType;
+import com.globalpayments.library.utilities.ReceiptHelper;
 import com.tsys.payments.library.db.entity.SafTransaction;
 import com.tsys.payments.library.domain.TransactionResponse;
 import java.math.BigDecimal;
@@ -301,6 +301,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         public void onDisconnected() {
             Log.d(TAG, "onDisconnected");
             MainActivity.mobyDevice = null;
+            MainActivity.c2XDevice = null;
             //update connection status
             runOnUiThread(new Runnable() {
                 @Override
