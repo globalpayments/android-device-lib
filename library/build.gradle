@@ -1,19 +1,28 @@
-apply plugin: 'com.android.library'
-apply from: "publish.gradle"
+
+plugins {
+    id "com.android.library"
+    id "com.vanniktech.maven.publish" version "0.28.0"
+    id "maven-publish"
+    id "signing"
+}
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
     namespace 'com.globalpayments.library'
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 30
         versionCode 30
-        versionName "2.0.0"
+        versionName "2.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
+
     }
 
     buildTypes {
@@ -61,7 +70,7 @@ dependencies {
     api 'com.heartlandpaymentsystems:globalpayments-ruadeviceservice:1.0.0'
     api 'com.heartlandpaymentsystems:globalpayments-temlibrary:1.0.0'
     api 'com.heartlandpaymentsystems:globalpayments-database-portico:1.0.2'
-    api 'com.heartlandpaymentsystems:globalpayments-transaction-manager:1.0.14'
+    api 'com.heartlandpaymentsystems:globalpayments-transaction-manager:1.0.15'
 
     // Apache Commons
     //implementation 'commons-codec:commons-codec:1.13'
@@ -87,10 +96,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'
 
-    compileOnly 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    testCompileOnly "org.projectlombok:lombok:1.18.12"
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.12"
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testCompileOnly "org.projectlombok:lombok:1.18.30"
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.30"
 
     implementation "androidx.sqlite:sqlite:2.0.1"
 
@@ -116,24 +125,95 @@ dependencies {
     androidTestImplementation "androidx.work:work-testing:$work_version"
 }
 
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    android.libraryVariants.all { variant ->
-        if (variant.name == 'release') {
-            owner.classpath += variant.javaCompileProvider.get().classpath
+import com.vanniktech.maven.publish.SonatypeHost
+
+// Artifact parameters
+def sdkGroupId = 'com.heartlandpaymentsystems'
+def sdkArtifactId = 'android-device-lib'
+def sdkVersion = android.defaultConfig.versionName
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = sdkGroupId
+                artifactId = sdkArtifactId
+                version = sdkVersion
+
+                afterEvaluate {
+                    from components.release
+                }
+
+                pom {
+                    name = sdkArtifactId
+                    description = 'The official Global Payments Android Device Library.'
+                    url = 'https://developer.globalpay.com/'
+
+                    licenses {
+                        license {
+                            name = 'The MIT License (MIT)'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'globalpayments'
+                            name = 'Global Payments'
+                            email = 'developers@globalpayments.com'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:git:git://github.com/globalpayments/android-device-lib.git'
+                        developerConnection = 'scm:git:ssh://globalpayments/android-device-lib.git'
+                        url = 'https://github.com/globalpayments/android-device-lib'
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = "ossrh-staging-api"
+                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+            }
         }
     }
-    exclude '**/R.html', '**/R.*.html', '**/index.html'
-    options.addBooleanOption('-ignore-source-errors', true)
+
+    mavenPublishing {
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+        coordinates(sdkGroupId, sdkArtifactId, sdkVersion)
+        signAllPublications()
+
+        pom {
+            name = sdkArtifactId
+            description = 'The official Global Payments Android Device Library.'
+            url = 'https://developer.globalpay.com/'
+            licenses {
+                license {
+                    name = 'The MIT License (MIT)'
+                    url = 'https://opensource.org/licenses/MIT'
+                }
+            }
+
+            developers {
+                developer {
+                    id = 'globalpayments'
+                    name = 'Global Payments'
+                    email = 'developers@globalpayments.com'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:git://github.com/globalpayments/android-device-lib.git'
+                developerConnection = 'scm:git:ssh://globalpayments/android-device-lib.git'
+                url = 'https://github.com/globalpayments/android-device-lib'
+            }
+        }
+    }
 }
 
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    archiveClassifier.set('javadoc')
-    from androidJavadocs.destinationDir
-}
-
-task androidSourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from android.sourceSets.main.java.srcDirs
+signing {
+    sign publishing.publications
 }

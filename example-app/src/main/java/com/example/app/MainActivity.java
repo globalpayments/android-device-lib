@@ -213,131 +213,117 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.credentials_button:
-                Intent credentialsIntent = new Intent(this, CredentialsActivity.class);
-                startActivity(credentialsIntent);
-                break;
-            case R.id.connect_to_device_button:
-                if (areCredentialsNull()) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
-                    return;
-                }
-                try {
-                    if (c2XDevice == null) {
-                        c2XDevice =
-                                new C2XDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
-                    } else {
-                        c2XDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.BLUETOOTH));
-                    }
-                } catch (Exception e) {
-                    showAlertDialog(getString(R.string.configuration_error), e.getMessage());
-                    return;
-                }
-                Intent connectIntent = new Intent(this, BluetoothActivity.class);
-                connectIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.BLUETOOTH);
-                startActivity(connectIntent);
-                break;
-            case R.id.connect_to_moby_button:
-                if (areCredentialsNull()) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
-                    return;
-                }
-                try {
-                    if (mobyDevice == null) {
-                        mobyDevice =
-                                new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
-                    } else {
-                        mobyDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.BLUETOOTH));
-                    }
-                } catch (Exception e) {
-                    showAlertDialog(getString(R.string.configuration_error), e.getMessage());
-                    return;
-                }
-                Intent mobyIntent = new Intent(this, BluetoothActivity.class);
-                mobyIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.BLUETOOTH);
-                startActivity(mobyIntent);
-                break;
-            case R.id.connect_to_mobyUSB_button:
-                if (areCredentialsNull()) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
-                    return;
-                }
-                try {
-                    if (mobyDevice == null) {
-                        mobyDevice = new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.USB));
-                    } else {
-                        mobyDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.USB));
-                    }
-                } catch (Exception e) {
-                    showAlertDialog(getString(R.string.configuration_error), e.getMessage());
-                    return;
-                }
-                Intent mobyUsbIntent = new Intent(this, BluetoothActivity.class);
-                mobyUsbIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.USB);
-                startActivity(mobyUsbIntent);
-                break;
-            case R.id.manual_card_button:
-                Intent manualIntent = new Intent(this, CardEntryActivity.class);
-                startActivity(manualIntent);
-                break;
-            case R.id.transaction_button:
-                Intent transactionIntent = new Intent(this, TransactionListActivity.class);
-                startActivity(transactionIntent);
-                break;
-            case R.id.ota_update_button:
-                Intent updateIntent = new Intent(this, OTAUpdateActivity.class);
-                startActivity(updateIntent);
-                break;
-            case R.id.simpleSwitch:
-                if (environmentSwitch.isChecked()) {
-                    Toast.makeText(this, "Prod is Selected", Toast.LENGTH_LONG).show();
+        if (view.getId() == R.id.credentials_button) {
+            Intent credentialsIntent = new Intent(this, CredentialsActivity.class);
+            startActivity(credentialsIntent);
+        } else if (view.getId() == R.id.connect_to_device_button) {
+            if (areCredentialsNull()) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
+                return;
+            }
+            try {
+                if (c2XDevice == null) {
+                    c2XDevice =
+                            new C2XDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
                 } else {
-                    Toast.makeText(this, "Test is Selected", Toast.LENGTH_LONG).show();
+                    c2XDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.BLUETOOTH));
                 }
-                break;
-            case R.id.about_button:
-                if (mobyDevice != null && mobyDevice.isConnected()) {
-                    isAboutClick = true;
-                    mobyDevice.getDeviceInfo();
-                }
-                break;
-            case R.id.disconnect_button:
-                if (mobyDevice != null && mobyDevice.isConnected()) {
-                    mobyDevice.disconnect();
-                    mobyDevice = null;
-                    startCounter = 1;
-                    showHideButtonDisplay(false, DeviceType.MOBY);
-                } else if (c2XDevice != null && c2XDevice.isConnected()) {
-                    c2XDevice.disconnect();
-                    c2XDevice = null;
-                    startCounter = 1;
-                    showHideButtonDisplay(false, DeviceType.C2X_C3X);
+            } catch (Exception e) {
+                showAlertDialog(getString(R.string.configuration_error), e.getMessage());
+                return;
+            }
+            Intent connectIntent = new Intent(this, BluetoothActivity.class);
+            connectIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.BLUETOOTH);
+            startActivity(connectIntent);
+        } else if (view.getId() == R.id.connect_to_moby_button) {
+            if (areCredentialsNull()) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
+                return;
+            }
+            try {
+                if (mobyDevice == null) {
+                    mobyDevice =
+                            new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.BLUETOOTH));
                 } else {
-                    showHideButtonDisplay(false, DeviceType.MOBY);
+                    mobyDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.BLUETOOTH));
                 }
-                break;
-            case R.id.saf_switch:
-                if (safSwitch.isChecked()) {
-                    Toast.makeText(this, "SAF is enabled", Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                showAlertDialog(getString(R.string.configuration_error), e.getMessage());
+                return;
+            }
+            Intent mobyIntent = new Intent(this, BluetoothActivity.class);
+            mobyIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.BLUETOOTH);
+            startActivity(mobyIntent);
+        } else if (view.getId() == R.id.connect_to_mobyUSB_button) {
+            if (areCredentialsNull()) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
+                return;
+            }
+            try {
+                if (mobyDevice == null) {
+                    mobyDevice = new MobyDevice(getApplicationContext(), getConnectionConfig(ConnectionMode.USB));
                 } else {
-                    Toast.makeText(this, "SAF is disabled", Toast.LENGTH_LONG).show();
+                    mobyDevice.setConnectionConfig(getConnectionConfig(ConnectionMode.USB));
                 }
-                break;
-            case R.id.surcharge_switch:
-                if (surchargeSwitch.isChecked()) {
-                    Toast.makeText(this, "Surcharge is enabled", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(this, "Surcharge is disabled", Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.surcharge_pretax_switch:
-                if (surchargePretaxSwitch.isChecked()) {
-                    Toast.makeText(this, "Surcharge Pre-Tax is enabled", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(this, "Surcharge Pre-Tax is disabled", Toast.LENGTH_LONG).show();
-                }
-                break;
+            } catch (Exception e) {
+                showAlertDialog(getString(R.string.configuration_error), e.getMessage());
+                return;
+            }
+            Intent mobyUsbIntent = new Intent(this, BluetoothActivity.class);
+            mobyUsbIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.USB);
+            startActivity(mobyUsbIntent);
+        } else if (view.getId() == R.id.manual_card_button) {
+            Intent manualIntent = new Intent(this, CardEntryActivity.class);
+            startActivity(manualIntent);
+        } else if (view.getId() == R.id.transaction_button) {
+            Intent transactionIntent = new Intent(this, TransactionListActivity.class);
+            startActivity(transactionIntent);
+        } else if (view.getId() == R.id.ota_update_button) {
+            Intent updateIntent = new Intent(this, OTAUpdateActivity.class);
+            startActivity(updateIntent);
+        } else if (view.getId() == R.id.simpleSwitch) {
+            if (environmentSwitch.isChecked()) {
+                Toast.makeText(this, "Prod is Selected", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Test is Selected", Toast.LENGTH_LONG).show();
+            }
+        } else if (view.getId() == R.id.about_button) {
+            if (mobyDevice != null && mobyDevice.isConnected()) {
+                isAboutClick = true;
+                mobyDevice.getDeviceInfo();
+            }
+        } else if (view.getId() == R.id.disconnect_button) {
+            if (mobyDevice != null && mobyDevice.isConnected()) {
+                mobyDevice.disconnect();
+                mobyDevice = null;
+                startCounter = 1;
+                showHideButtonDisplay(false, DeviceType.MOBY);
+            } else if (c2XDevice != null && c2XDevice.isConnected()) {
+                c2XDevice.disconnect();
+                c2XDevice = null;
+                startCounter = 1;
+                showHideButtonDisplay(false, DeviceType.C2X_C3X);
+            } else {
+                showHideButtonDisplay(false, DeviceType.MOBY);
+            }
+        } else if (view.getId() == R.id.saf_switch) {
+            if (safSwitch.isChecked()) {
+                Toast.makeText(this, "SAF is enabled", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "SAF is disabled", Toast.LENGTH_LONG).show();
+            }
+        } else if (view.getId() == R.id.surcharge_switch) {
+            if (surchargeSwitch.isChecked()) {
+                Toast.makeText(this, "Surcharge is enabled", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Surcharge is disabled", Toast.LENGTH_LONG).show();
+            }
+        } else if (view.getId() == R.id.surcharge_pretax_switch) {
+            if (surchargePretaxSwitch.isChecked()) {
+                Toast.makeText(this, "Surcharge Pre-Tax is enabled", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Surcharge Pre-Tax is disabled", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

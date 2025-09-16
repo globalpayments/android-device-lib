@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2025-09-16
+ 
+### Added
+
+### Changed
+- Updated project gradle settings.
+### Fixed
+- Fixed exception occurring when using incorrect card type for gift card read.
+
+
 ## [2.0.0] - 2025-06-24
  
 ### Added

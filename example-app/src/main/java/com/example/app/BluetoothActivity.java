@@ -86,40 +86,36 @@ public class BluetoothActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.scan_button:
-                if(MainActivity.c2XDevice != null) {
-                    MainActivity.c2XDevice.initialize();
-                } else {
-                    MainActivity.mobyDevice.initialize();
-                }
-
-                //update connection status
-                updateConnectionStatus("Scanning", false);
-                showProgress(this, "Scanning", "Scanning for Bluetooth devices", null);
-                break;
-            case R.id.reconnect_button:
-                SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SAVED_PREFS, MODE_PRIVATE);
-                String previousDevice = sharedPreferences.getString(MainActivity.BLUETOOTH_NAME, null);
-                String previousAddress = sharedPreferences.getString(MainActivity.BLUETOOTH_ADDRESS, null);
-
-                if(MainActivity.c2XDevice != null) {
-                    MainActivity.c2XDevice.connect(previousAddress);
-                } else {
-                    MainActivity.mobyDevice.connect(previousAddress);
-                }
-
-                Log.d(TAG, "bluetooth device connect - " + previousDevice);
-
-                //update connection status
-                updateConnectionStatus("Connecting - " + previousDevice,
-                        false);
-                break;
-            case R.id.connect_button:
-                updateConnectionStatus("Connecting USB", false);
-                showProgress(this, "Connecting", "Connecting to device using USB", null);
+        if (view.getId() == R.id.scan_button) {
+            if (MainActivity.c2XDevice != null) {
+                MainActivity.c2XDevice.initialize();
+            } else {
                 MainActivity.mobyDevice.initialize();
-                break;
+            }
+
+            //update connection status
+            updateConnectionStatus("Scanning", false);
+            showProgress(this, "Scanning", "Scanning for Bluetooth devices", null);
+        } else if (view.getId() == R.id.reconnect_button) {
+            SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SAVED_PREFS, MODE_PRIVATE);
+            String previousDevice = sharedPreferences.getString(MainActivity.BLUETOOTH_NAME, null);
+            String previousAddress = sharedPreferences.getString(MainActivity.BLUETOOTH_ADDRESS, null);
+
+            if(MainActivity.c2XDevice != null) {
+                MainActivity.c2XDevice.connect(previousAddress);
+            } else {
+                MainActivity.mobyDevice.connect(previousAddress);
+            }
+
+            Log.d(TAG, "bluetooth device connect - " + previousDevice);
+
+            //update connection status
+            updateConnectionStatus("Connecting - " + previousDevice,
+                    false);
+        } else if (view.getId() == R.id.connect_button) {
+            updateConnectionStatus("Connecting USB", false);
+            showProgress(this, "Connecting", "Connecting to device using USB", null);
+            MainActivity.mobyDevice.initialize();
         }
     }
 }

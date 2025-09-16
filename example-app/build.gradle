@@ -42,13 +42,13 @@ dependencies {
 
     //switch out commented code to change between local and hosted SDK
     //implementation project(path: ':library')
-    implementation 'com.heartlandpaymentsystems:android-device-lib:2.0.0'
+    implementation 'com.heartlandpaymentsystems:android-device-lib:2.0.1'
 
     // Timber Logging: https://github.com/JakeWharton/timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
-    compileOnly 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    testCompileOnly "org.projectlombok:lombok:1.18.12"
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.12"
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testCompileOnly "org.projectlombok:lombok:1.18.30"
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.30"
 }

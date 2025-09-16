@@ -31,62 +31,50 @@ public class TransactionListActivity extends BaseTransactionActivity implements 
     public void onClick(View view) {
         Intent intent;
         IDevice device;
-        switch (view.getId()) {
-            case R.id.creditsale_button:
-                intent = new Intent(this, CreditSaleActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.creditadjust_button:
-                intent = new Intent(this, CreditAdjustActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.creditauth_button:
-                intent = new Intent(this, CreditAuthActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.creditcapture_button:
-                intent = new Intent(this, CreditCaptureActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.creditreturn_button:
-                intent = new Intent(this, CreditReturnActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.creditvoid_button:
-                intent = new Intent(this, CreditVoidActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.batchclose_button:
-                intent = new Intent(this, BatchCloseActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.giftcard_button:
-                intent = new Intent(this, GiftCardActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.uploadsaf_button:
-                device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
-                if (device != null) {
-                    device.uploadSAF();
-                }
-                break;
-            case R.id.forcesaf_button:
-                device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
-                if (device != null) {
-                    boolean currentSetting = device.isForcedSafEnabled();
-                    device.setForcedSafEnabled(!currentSetting);
+        if (view.getId() == R.id.creditsale_button) {
+            intent = new Intent(this, CreditSaleActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.creditadjust_button) {
+            intent = new Intent(this, CreditAdjustActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.creditauth_button) {
+            intent = new Intent(this, CreditAuthActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.creditcapture_button) {
+            intent = new Intent(this, CreditCaptureActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.creditreturn_button) {
+            intent = new Intent(this, CreditReturnActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.creditvoid_button) {
+            intent = new Intent(this, CreditVoidActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.batchclose_button) {
+            intent = new Intent(this, BatchCloseActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.giftcard_button) {
+            intent = new Intent(this, GiftCardActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.uploadsaf_button) {
+            device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+            if (device != null) {
+                device.uploadSAF();
+            }
+        } else if (view.getId() == R.id.forcesaf_button) {
+            device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+            if (device != null) {
+                boolean currentSetting = device.isForcedSafEnabled();
+                device.setForcedSafEnabled(!currentSetting);
 
-                    boolean newSetting = device.isForcedSafEnabled();
-                    ((Button)view).setText(
-                            newSetting ? getString(R.string.forcesaf_on) : getString(R.string.forcesaf_off));
-                }
-                break;
-            case R.id.test_cancel_button:
-                device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
-                if (device != null) {
-                    device.cancelTransaction();
-                }
-                break;
+                boolean newSetting = device.isForcedSafEnabled();
+                ((Button)view).setText(
+                        newSetting ? getString(R.string.forcesaf_on) : getString(R.string.forcesaf_off));
+            }
+        } else if (view.getId() == R.id.test_cancel_button) {
+            device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+            if (device != null) {
+                device.cancelTransaction();
+            }
         }
     }
 }

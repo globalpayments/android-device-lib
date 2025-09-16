@@ -1,23 +1,17 @@
-apply plugin: "maven-publish"
-apply plugin: 'signing'
+plugins {
+    id "com.vanniktech.maven.publish" version "0.28.0"
+    id "maven-publish"
+    id "signing"
+}
+import com.vanniktech.maven.publish.SonatypeHost
 
 configurations.maybeCreate("default")
 def publishArtifact = artifacts.add("default", file('bbpos-release.aar'))
+
 // Artifact parameters
 def sdkGroupId = 'com.heartlandpaymentsystems'
 def sdkArtifactId = 'globalpayments-bbpos'
 def sdkVersion = '1.0.7'
-
-// publish.properties should contain signing properties and maven central credentials
-File publishPropertiesFile = file('../../publish.properties')
-Properties publishProperties = new Properties()
-new FileInputStream(publishPropertiesFile).withCloseable { is -> publishProperties.load(is) }
-
-ext["signing.keyId"] = publishProperties["signing.keyId"]
-ext["signing.password"] = publishProperties["signing.password"]
-ext["signing.secretKeyRingFile"] = publishProperties["signing.secretKeyRingFile"]
-ext["mavenCentralRepoUsername"] = publishProperties["mavenCentralRepoUsername"]
-ext["mavenCentralRepoPassword"] = publishProperties["mavenCentralRepoPassword"]
 
 afterEvaluate {
     publishing {
@@ -61,12 +55,40 @@ afterEvaluate {
 
         repositories {
             maven {
-                name = "MavenCentral"
-                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                credentials {
-                    username mavenCentralRepoUsername
-                    password mavenCentralRepoPassword
+                name = "ossrh-staging-api"
+                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+            }
+        }
+    }
+
+    mavenPublishing {
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+        coordinates(sdkGroupId, sdkArtifactId, sdkVersion)
+        signAllPublications()
+
+        pom {
+            name = sdkArtifactId
+            description = 'BBPos library for supporting the Global Payments Android device library.'
+            url = 'https://developer.globalpay.com/'
+            licenses {
+                license {
+                    name = 'The MIT License (MIT)'
+                    url = 'https://opensource.org/licenses/MIT'
                 }
+            }
+
+            developers {
+                developer {
+                    id = 'globalpayments'
+                    name = 'Global Payments'
+                    email = 'developers@globalpayments.com'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:git://github.com/globalpayments/android-device-lib.git'
+                developerConnection = 'scm:git:ssh://globalpayments/android-device-lib.git'
+                url = 'https://github.com/globalpayments/android-device-lib'
             }
         }
     }

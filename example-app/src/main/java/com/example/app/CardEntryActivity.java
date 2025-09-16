@@ -176,44 +176,42 @@ public class CardEntryActivity extends BaseActivity implements CardFragmentInter
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()) {
-            case R.id.creditsale_manual_button:
-                String cardNo = ((EditText) findViewById(R.id.card_no_edt)).getText().toString();
-                String month = ((EditText) findViewById(R.id.card_exp_date_edt)).getText().toString();
-                String year = ((EditText) findViewById(R.id.card_exp_yr_edt)).getText().toString();
-                String cvv = ((EditText) findViewById(R.id.card_cvv_edt)).getText().toString();
-                int expMonth = 0;
-                int expYear = 0;
-                try {
-                    expMonth = Integer.parseInt(month);
-                    expYear = Integer.parseInt(year);
-                }catch (NumberFormatException e) {
-                    e.printStackTrace();
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_enter_valid_expiration));
-                }
+        if (view.getId() == R.id.creditsale_manual_button) {
+            String cardNo = ((EditText)findViewById(R.id.card_no_edt)).getText().toString();
+            String month = ((EditText)findViewById(R.id.card_exp_date_edt)).getText().toString();
+            String year = ((EditText)findViewById(R.id.card_exp_yr_edt)).getText().toString();
+            String cvv = ((EditText)findViewById(R.id.card_cvv_edt)).getText().toString();
+            int expMonth = 0;
+            int expYear = 0;
+            try {
+                expMonth = Integer.parseInt(month);
+                expYear = Integer.parseInt(year);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                showAlertDialog(getString(R.string.error), getString(R.string.error_enter_valid_expiration));
+            }
 
-                //check for missing fields
-                if (cardNo.isEmpty() || cvv.isEmpty()) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_enter_valid_card));
-                    return;
-                }
+            //check for missing fields
+            if (cardNo.isEmpty() || cvv.isEmpty()) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_enter_valid_card));
+                return;
+            }
 
-                Card card = new Card();
-                card.setNumber(cardNo);
-                card.setExpMonth(expMonth);
-                card.setExpYear(expYear);
-                card.setCvv(cvv);
-                IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
-                CreditSaleBuilder builder = new CreditSaleBuilder(device);
-                builder.setAmount(new BigDecimal("10.00"));
-                builder.setCreditCard(card);
-                try {
-                    builder.execute();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_enter_valid_card));
-                }
-                break;
+            Card card = new Card();
+            card.setNumber(cardNo);
+            card.setExpMonth(expMonth);
+            card.setExpYear(expYear);
+            card.setCvv(cvv);
+            IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+            CreditSaleBuilder builder = new CreditSaleBuilder(device);
+            builder.setAmount(new BigDecimal("10.00"));
+            builder.setCreditCard(card);
+            try {
+                builder.execute();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                showAlertDialog(getString(R.string.error), getString(R.string.error_enter_valid_card));
+            }
         }
     }
 

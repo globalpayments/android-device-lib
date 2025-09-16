@@ -44,53 +44,49 @@ public class OTAUpdateActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.check_firmware_button:
-                if ((MainActivity.mobyDevice == null || !MainActivity.mobyDevice.isConnected()) &&
-                        (MainActivity.c2XDevice == null || !MainActivity.c2XDevice.isConnected())) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected_ota));
-                    return;
-                }
+        if (view.getId() == R.id.check_firmware_button) {
+            if ((MainActivity.mobyDevice == null || !MainActivity.mobyDevice.isConnected()) &&
+                    (MainActivity.c2XDevice == null || !MainActivity.c2XDevice.isConnected())) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected_ota));
+                return;
+            }
 
-                showProgress(this, getString(R.string.checking), getString(R.string.checking_firmware), null);
+            showProgress(this, getString(R.string.checking), getString(R.string.checking_firmware), null);
 
-                if (MainActivity.mobyDevice != null) {
-                    MainActivity.mobyDevice.getAvailableTerminalVersions(TerminalUpdateType.FIRMWARE);
-                } else {
-                    MainActivity.c2XDevice.getAvailableTerminalVersions(TerminalUpdateType.FIRMWARE);
-                }
-                break;
-            case R.id.check_kernel_button:
-                if ((MainActivity.mobyDevice == null || !MainActivity.mobyDevice.isConnected()) &&
-                        (MainActivity.c2XDevice == null || !MainActivity.c2XDevice.isConnected())) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected_ota));
-                    return;
-                }
+            if (MainActivity.mobyDevice != null) {
+                MainActivity.mobyDevice.getAvailableTerminalVersions(TerminalUpdateType.FIRMWARE);
+            } else {
+                MainActivity.c2XDevice.getAvailableTerminalVersions(TerminalUpdateType.FIRMWARE);
+            }
+        } else if (view.getId() == R.id.check_kernel_button) {
+            if ((MainActivity.mobyDevice == null || !MainActivity.mobyDevice.isConnected()) &&
+                    (MainActivity.c2XDevice == null || !MainActivity.c2XDevice.isConnected())) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected_ota));
+                return;
+            }
 
-                showProgress(this, getString(R.string.checking), getString(R.string.checking_kernel), null);
+            showProgress(this, getString(R.string.checking), getString(R.string.checking_kernel), null);
 
-                if (MainActivity.mobyDevice != null) {
-                    MainActivity.mobyDevice.getAvailableTerminalVersions(TerminalUpdateType.CONFIG);
-                } else {
-                    MainActivity.c2XDevice.getAvailableTerminalVersions(TerminalUpdateType.CONFIG);
-                }
-                break;
-            case R.id.rki_button:
-                if ((MainActivity.mobyDevice == null || !MainActivity.mobyDevice.isConnected()) &&
-                        (MainActivity.c2XDevice == null || !MainActivity.c2XDevice.isConnected())) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected_ota));
-                    return;
-                }
+            if (MainActivity.mobyDevice != null) {
+                MainActivity.mobyDevice.getAvailableTerminalVersions(TerminalUpdateType.CONFIG);
+            } else {
+                MainActivity.c2XDevice.getAvailableTerminalVersions(TerminalUpdateType.CONFIG);
+            }
+        } else if (view.getId() == R.id.rki_button) {
+            if ((MainActivity.mobyDevice == null || !MainActivity.mobyDevice.isConnected()) &&
+                    (MainActivity.c2XDevice == null || !MainActivity.c2XDevice.isConnected())) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected_ota));
+                return;
+            }
 
-                if (MainActivity.mobyDevice != null) {
-                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_supported_rki));
-                    return;
-                }
+            if (MainActivity.mobyDevice != null) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_supported_rki));
+                return;
+            }
 
-                terminalUpdateType = TerminalUpdateType.RKI;
-                showProgress(this, getString(R.string.checking), getString(R.string.checking_kernel), null);
-                MainActivity.c2XDevice.remoteKeyInjection();
-                break;
+            terminalUpdateType = TerminalUpdateType.RKI;
+            showProgress(this, getString(R.string.checking), getString(R.string.checking_kernel), null);
+            MainActivity.c2XDevice.remoteKeyInjection();
         }
     }
 
