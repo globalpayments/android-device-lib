@@ -2,6 +2,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.2] - 2026-02-24
+ 
+### Added
+
+### Changed
+
+### Fixed
+- Fixed issue with sometimes having a missing KSN for offline transactions.
+- Fixed exception/crash for SAF upload.
+- Fixed bluetooth issue for Android 12+ devices.
+
+
 ## [2.0.1] - 2025-09-16
  
 ### Added

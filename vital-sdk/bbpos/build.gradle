@@ -11,7 +11,7 @@ def publishArtifact = artifacts.add("default", file('bbpos-release.aar'))
 // Artifact parameters
 def sdkGroupId = 'com.heartlandpaymentsystems'
 def sdkArtifactId = 'globalpayments-bbpos'
-def sdkVersion = '1.0.7'
+def sdkVersion = '1.0.8'
 
 afterEvaluate {
     publishing {
