@@ -7,7 +7,7 @@ This Android library lets you connect to a C2X, C3X, or Moby 5500 device and pro
 Maven
 -------------
 ```java
-implementation 'com.heartlandpaymentsystems:android-device-lib:2.0.2'
+implementation 'com.heartlandpaymentsystems:android-device-lib:2.0.3'
 ```
 
 Example App

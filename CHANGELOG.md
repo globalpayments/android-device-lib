@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.3] - 2026-03-31
+ 
+### Added
+
+### Changed
+
+### Fixed
+- Fixed various issues with SAF, specifically SAF upload.
+
+
 ## [2.0.2] - 2026-02-24
  
 ### Added
