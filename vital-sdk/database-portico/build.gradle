@@ -6,7 +6,13 @@ plugins {
 import com.vanniktech.maven.publish.SonatypeHost
 
 configurations.maybeCreate("default")
-def publishArtifact = artifacts.add("default", file('database-portico-release.aar'))
+def isRelease = project.findProperty("isRelease") == "true"
+def buildType = isRelease ? "release" : "debug"
+def aarFile = file("database-portico-${buildType}.aar")
+if (!aarFile.exists()) {
+    throw new GradleException("AAR not found: ${aarFile}. Did you build it first?")
+}
+def publishArtifact = artifacts.add("default", aarFile)
 
 // Artifact parameters
 def sdkGroupId = 'com.heartlandpaymentsystems'

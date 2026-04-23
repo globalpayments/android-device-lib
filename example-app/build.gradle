@@ -9,7 +9,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 34
         versionCode 10
-        versionName "1.1.9"
+        versionName "1.2.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -35,7 +35,7 @@ android {
             def versionName = variant.versionName
             def date = new Date().format("yyyyMMdd_HHmm")
 
-            outputFileName = "${appName}-v${buildType}-v${versionName}-${date}.apk"
+            outputFileName = "${appName}-${buildType}-v${versionName}-${date}.apk"
         }
     }
 }
@@ -52,7 +52,7 @@ dependencies {
     implementation "androidx.work:work-runtime:2.9.0"
     //switch out commented code to change between local and hosted SDK
     //implementation project(path: ':library')
-    implementation 'com.heartlandpaymentsystems:android-device-lib:2.0.3'
+    implementation 'com.heartlandpaymentsystems:android-device-lib:2.0.4'
 
     // Timber Logging: https://github.com/JakeWharton/timber
     implementation 'com.jakewharton.timber:timber:4.7.1'

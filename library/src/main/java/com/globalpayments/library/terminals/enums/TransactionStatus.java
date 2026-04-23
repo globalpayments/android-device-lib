@@ -1,5 +1,7 @@
 package com.globalpayments.library.terminals.enums;
 
+import timber.log.Timber;
+
 public enum TransactionStatus {
     NONE,
     WAITING_FOR_CARD,
@@ -22,35 +24,30 @@ public enum TransactionStatus {
     REMOVE_CARD,
     CONFIGURING,
     SEE_PHONE,
+    //New Status added
+    INSERT_CARD,
+    INSERT_TAP_CARD,
+    REINSERT_CARD,
+    TAP_CARD,
+    TAP_AGAIN_CARD,
+    TRY_ANOTHER_CARD,
+    SWIPE_CARD,
+    TAP_SWIPE_CARD,
+    INSERT_SWIPE_OR_TRY_ANOTHER_CARD,
+    //End of New Status
     PROCESSING;
 
     public static TransactionStatus fromVitalSdk(com.tsys.payments.library.enums.TransactionStatus status) {
+        Timber.d("FromVitalSDK called with status = [%s]", status);
         if (status == null) return NONE;
 
-        switch (status) {
-            case WAITING_FOR_CARD: return WAITING_FOR_CARD;
-            case BAD_READ: return BAD_READ;
-            case ICC_SWIPED: return ICC_SWIPED;
-            case FALLBACK_INITIATED: return FALLBACK_INITIATED;
-            case MULTIPLE_CARDS_DETECTED: return MULTIPLE_CARDS_DETECTED;
-            case CARD_READ: return CARD_READ;
-            case TECHNICAL_FALLBACK_INITIATED: return TECHNICAL_FALLBACK_INITIATED;
-            case CARD_READ_ERROR: return CARD_READ_ERROR;
-            case CARD_REMOVED_AFTER_TRANSACTION_COMPLETE: return CARD_REMOVED_AFTER_TRANSACTION_COMPLETE;
-            case CONTACTLESS_CARD_STILL_IN_FIELD: return CONTACTLESS_CARD_STILL_IN_FIELD;
-            case CONTACTLESS_INTERFACE_FAILED_TRY_CONTACT: return CONTACTLESS_INTERFACE_FAILED_TRY_CONTACT;
-            case DO_NOT_REMOVE_CARD: return DO_NOT_REMOVE_CARD;
-            case DEVICE_BUSY: return DEVICE_BUSY;
-            case ENTER_PIN: return ENTER_PIN;
-            case LAST_PIN_ATTEMPT: return LAST_PIN_ATTEMPT;
-            case PIN_ACCEPTED: return PIN_ACCEPTED;
-            case RETRY_PIN: return RETRY_PIN;
-            case REMOVE_CARD: return REMOVE_CARD;
-            case CONFIGURING: return CONFIGURING;
-            case SEE_PHONE: return SEE_PHONE;
-            case PROCESSING: return PROCESSING;
+        try{
+            TransactionStatus transStatus = TransactionStatus.valueOf(status.name());
+            Timber.d("FromVitalSDK to transactionStatus =[%s]", transStatus);
+            return transStatus;
+        } catch (IllegalArgumentException e) {
+            Timber.e("Missing enum mapping for status: [%s]", status.name());
+            return NONE;
         }
-
-        return NONE;
     }
 }

@@ -50,7 +50,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public static String SITE_ID;
     public static String DEVICE_ID;
     public static String LICENSE_ID;
-   
 
     private static boolean isAboutClick = false;
     private Switch environmentSwitch;

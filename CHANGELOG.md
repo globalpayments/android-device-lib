@@ -2,6 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.4] - 2026-04-23
+ 
+### Added
+- Additional terminal statuses included for Ingenico Moby 5500.
+### Changed
+- Updated SAF upload so that no new surcharge is added.
+### Fixed
+
+
 ## [2.0.3] - 2026-03-31
  
 ### Added
