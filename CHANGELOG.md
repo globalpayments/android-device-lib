@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.6] - 2026-06-18
+ 
+### Added
+
+### Changed
+- Attempting to start a transaction while SAF upload is in progress will now return an error.
+### Fixed
+- Fixed cancel for SAF upload which will allow the current transaction being processed to complete before ending the upload process.
+
+
 ## [2.0.5] - 2026-05-21
  
 ### Added

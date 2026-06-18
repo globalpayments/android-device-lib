@@ -26,6 +26,7 @@ import com.globalpayments.library.terminals.enums.ErrorType;
 import com.globalpayments.library.utilities.ReceiptHelper;
 import com.tsys.payments.library.db.entity.SafTransaction;
 import com.tsys.payments.library.domain.TransactionResponse;
+import com.tsys.payments.library.enums.TransactionResultType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -505,7 +506,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         public void onStoredTransactionComplete(String id, TransactionResponse transactionResponse) {
             //acknowledge the transaction so it can be deleted
             IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
-            device.acknowledgeSAFTransaction(id);
+            if (transactionResponse.getTransactionResult() != TransactionResultType.CANCELLED) {
+                device.acknowledgeSAFTransaction(id);
+            }
 
             //show toast
             runOnUiThread(new Runnable() {

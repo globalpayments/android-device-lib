@@ -176,7 +176,7 @@ public class Dialogs {
             message += "Device Response Code: " + responses.get(i).getTransactionResult() + "\n";
             message += "Transaction ID: " + responses.get(i).getGatewayTransactionId() + "\n";
             message += "Transaction Type: " + responses.get(i).getTransactionType() + "\n";
-            message += "Amount: " + (responses.get(i).getApprovedAmount() / 100f) + "\n\n";
+            message += "Amount: " + (responses.get(i).getApprovedAmount() != null ? (responses.get(i).getApprovedAmount() / 100f) : null) + "\n\n";
         }
 
         return message.replace("_", " ");
