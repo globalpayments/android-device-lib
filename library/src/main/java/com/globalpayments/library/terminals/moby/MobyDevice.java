@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.globalpayments.library.terminals.moby.mobySaf.MobySafManager;
 import com.globalpayments.library.terminals.receivers.BluetoothDiscoveryListener;
 import com.globalpayments.library.BuildConfig;
 import com.globalpayments.library.R;
@@ -77,6 +79,7 @@ public class MobyDevice implements IDevice {
 
     private static boolean timberPlanted;
     private TransactionManager transactionManager;
+    private MobySafManager mobySafManager;
     private Context applicationContext;
     private Context mobyPairingContext;
     private ConnectionConfig connectionConfig;
@@ -89,6 +92,7 @@ public class MobyDevice implements IDevice {
     private DeviceListener deviceListener;
     private TransactionListener transactionListener;
     private SafListener safListener;
+    private SafListener uploadSafListener;
     private AvailableTerminalVersionsListener availableTerminalVersionsListener;
     private UpdateTerminalListener updateTerminalListener;
     private PairingLedView pairingLedView;
@@ -192,6 +196,20 @@ public class MobyDevice implements IDevice {
     }
 
     /**
+     * Initialize SAF manager
+     */
+    protected void initializeMobySafManager () {
+        try {
+            mobySafManager.initialize(
+                terminalConfig,
+                gatewayConfig
+            );
+        } catch (InitializationException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
      * Initialize transaction manager.
      */
     protected void initializeTransactionManager() {
@@ -217,10 +235,10 @@ public class MobyDevice implements IDevice {
 
     @Override
     public void uploadSAF() {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
+        if (mobySafManager == null) {
+            mobySafManager = MobySafManager.getInstance();
         }
-        transactionManager.processAllSafTransactions(new SafListenerImpl());
+        mobySafManager.processAllSafTransactions(new SafListenerImpl(uploadSafListener));
     }
 
     /**
@@ -283,6 +301,10 @@ public class MobyDevice implements IDevice {
 
     public void setSafListener(SafListener safListener) {
         this.safListener = safListener;
+    }
+
+    public void setUploadSafListener(SafListener safListener) {
+        this.uploadSafListener = safListener;
     }
 
     public void setAvailableTerminalVersionsListener(
@@ -401,6 +423,7 @@ public class MobyDevice implements IDevice {
                 isScanned = false;
             }
             initializeTransactionManager();
+            initializeMobySafManager();
 
             if (transactionManager.isInitialized()) {
                 Timber.d("TransactionManager isInitialized() called");
@@ -826,46 +849,54 @@ public class MobyDevice implements IDevice {
     }
 
     protected class SafListenerImpl implements com.tsys.payments.library.db.SafListener {
+        private SafListener safListener = MobyDevice.this.safListener;
+
+        public SafListenerImpl() {}
+
+        public SafListenerImpl(@Nullable SafListener safListener) {
+            this.safListener = safListener;
+        }
+
         @Override
         public void onProcessingComplete(List<TransactionResponse> responses) {
             Timber.d("onProcessingComplete - count - " + responses.size());
             for (TransactionResponse transactionResponse : responses) {
                 Timber.d("response: " + transactionResponse);
             }
-            if (safListener != null) {
-                safListener.onProcessingComplete(responses);
+            if (this.safListener != null) {
+                this.safListener.onProcessingComplete(responses);
             }
         }
 
         @Override
         public void onAllSafTransactionsRetrieved(List<SafTransaction> obfuscatedSafTransactions) {
             Timber.d("onAllSafTransactionsRetrieved - count - " + obfuscatedSafTransactions.size());
-            if (safListener != null) {
-                safListener.onAllSafTransactionsRetrieved(obfuscatedSafTransactions);
+            if (this.safListener != null) {
+                this.safListener.onAllSafTransactionsRetrieved(obfuscatedSafTransactions);
             }
         }
 
         @Override
         public void onError(Error error) {
             Timber.d("onError - " + error);
-            if (safListener != null) {
-                safListener.onError(new java.lang.Error(error.getMessage()));
+            if (this.safListener != null) {
+                this.safListener.onError(new java.lang.Error(error.getMessage()));
             }
         }
 
         @Override
         public void onTransactionStored(String id, int totalCount, BigDecimal totalAmount) {
             Timber.d("onTransactionStored - id - " + id + ", count - " + totalCount + ", amount - " + totalAmount);
-            if (safListener != null) {
-                safListener.onTransactionStored(id, totalCount, totalAmount);
+            if (this.safListener != null) {
+                this.safListener.onTransactionStored(id, totalCount, totalAmount);
             }
         }
 
         @Override
         public void onStoredTransactionComplete(String id, TransactionResponse transactionResponse) {
             Timber.d("onStoredTransactionComplete - id - " + id + ", response - " + transactionResponse);
-            if (safListener != null) {
-                safListener.onStoredTransactionComplete(id, transactionResponse);
+            if (this.safListener != null) {
+                this.safListener.onStoredTransactionComplete(id, transactionResponse);
             }
         }
     };
