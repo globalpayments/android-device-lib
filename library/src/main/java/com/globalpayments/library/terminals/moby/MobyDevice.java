@@ -1,16 +1,19 @@
 package com.globalpayments.library.terminals.moby;
 
+import android.Manifest.permission;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import com.globalpayments.library.terminals.receivers.BluetoothDiscoveryListener;
 import com.globalpayments.library.BuildConfig;
 import com.globalpayments.library.R;
@@ -65,6 +68,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
@@ -153,7 +158,7 @@ public class MobyDevice implements IDevice {
 
         terminalConfig = new TerminalConfiguration();
         terminalConfig.setTerminalType(TerminalType.INGENICO_MOBY_5500);
-        terminalConfig.setCapability(TerminalInputCapability.MAGSTRIPE_ICC_KEYED_ENTRY_ONLY);
+        terminalConfig.setCapability(TerminalInputCapability.ICC_CHIP_CONTACT_CONTACTLESS);
         terminalConfig.setOutputCapability(TerminalOutputCapability.PRINT_AND_DISPLAY);
         terminalConfig.setAuthenticationCapability(TerminalAuthenticationCapability.NO_CAPABILITY);
         terminalConfig.setOperatingEnvironment(TerminalOperatingEnvironment.ON_MERCHANT_PREMISES_ATTENDED);
@@ -172,18 +177,31 @@ public class MobyDevice implements IDevice {
         }
 
         HashMap<String, String> credentials = new HashMap<>();
-        credentials.put("version_number", "3409");
-        credentials.put("developer_id", "002914");
-        credentials.put("user_name", connectionConfig.getUsername());
-        credentials.put("license_id", connectionConfig.getLicenseId());
-        credentials.put("site_id", connectionConfig.getSiteId());
-        credentials.put("password", connectionConfig.getPassword());
-        credentials.put("terminal_id", connectionConfig.getDeviceId());
+        if (connectionConfig.getGateway() == GatewayType.PORTICO) {
+            credentials.put("version_number", "3409");
+            credentials.put("developer_id", "002914");
+            credentials.put("user_name", connectionConfig.getCredentials().getUsername());
+            credentials.put("license_id", connectionConfig.getCredentials().getLicenseId());
+            credentials.put("site_id", connectionConfig.getCredentials().getSiteId());
+            credentials.put("password", connectionConfig.getCredentials().getPassword());
+            credentials.put("terminal_id", connectionConfig.getCredentials().getDeviceId());
+        } else {
+            credentials.put("merchant_id", connectionConfig.getCredentials().getMerchantId());
+            credentials.put("user_name", connectionConfig.getCredentials().getUsername());
+            credentials.put("password", connectionConfig.getCredentials().getPassword());
+            credentials.put("device_id", connectionConfig.getCredentials().getDeviceId());
+            credentials.put("developer_id", connectionConfig.getCredentials().getDeveloperId());
+            credentials.put("transaction_key", connectionConfig.getCredentials().getTransactionKey());
+        }
 
         gatewayConfig = new GatewayConfiguration();
-        gatewayConfig.setGatewayType(GatewayType.PORTICO);
+        gatewayConfig.setGatewayType(connectionConfig.getGateway());
         gatewayConfig.setCredentials(credentials);
 
+        if (connectionConfig.isSafEnabled() && connectionConfig.getGateway() == GatewayType.TRANSIT) {
+            //SAF is not yet supported for TransIT
+            throw new Exception("SAF is not yet supported for TransIT");
+        }
         SafDatabaseConfig safDatabaseConfig = new SafDatabaseConfig(connectionConfig.isSafEnabled(),
                 connectionConfig.getSafExpirationInDays(), TimeUnit.DAYS);
         databaseConfig = new DatabaseConfig(applicationContext, "mobyDB", null,
@@ -400,13 +418,39 @@ public class MobyDevice implements IDevice {
                 terminalConfig.setHost(null);
                 isScanned = false;
             }
-            initializeTransactionManager();
 
-            if (transactionManager.isInitialized()) {
-                Timber.d("TransactionManager isInitialized() called");
-                transactionManager.connect(new ConnectionListenerImpl());
-                transactionManager.updateTransactionListener(new TransactionListenerImpl());
-            }
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.execute(() -> {
+                initializeTransactionManager();
+
+                if (transactionManager.isInitialized()) {
+                    Timber.d("TransactionManager isInitialized() called");
+                    transactionManager.connect(new ConnectionListenerImpl());
+                    transactionManager.updateTransactionListener(new TransactionListenerImpl());
+                }
+            });
+            /*final boolean[] initialized = {false};
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e("test", "thread start");
+                    initializeTransactionManager();
+                    Log.e("test", "initialize finish");
+                    initialized[0] = true;
+                }
+            });
+            thread.start();
+
+            while (!initialized[0]) {
+                try {
+                    Log.e("test", "waiting on initialize");
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }*/
+
+
         }
     }
 
@@ -522,7 +566,7 @@ public class MobyDevice implements IDevice {
         ti.setSerialNumber(info.getSerialNumber());
         ti.setTerminalType(info.getTerminalType());
         ti.setModel(info.getModel());
-        ti.setModel(info.getManufacturer());
+        ti.setManufacturer(info.getManufacturer());
         return ti;
     }
 
@@ -626,7 +670,19 @@ public class MobyDevice implements IDevice {
                 return;
             }
 
+            if (ActivityCompat.checkSelfPermission(applicationContext, permission.BLUETOOTH_CONNECT) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             if (foundDevice.getType() != BluetoothDevice.DEVICE_TYPE_CLASSIC &&
+                    foundDevice.getType() != BluetoothDevice.DEVICE_TYPE_LE &&
                     foundDevice.getType() != BluetoothDevice.DEVICE_TYPE_DUAL) {
                 return;
             }

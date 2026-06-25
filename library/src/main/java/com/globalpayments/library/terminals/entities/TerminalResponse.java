@@ -5,6 +5,7 @@ import com.globalpayments.library.terminals.enums.ApplicationCryptogramType;
 import com.globalpayments.library.terminals.enums.EntryMode;
 import com.tsys.payments.library.domain.Receipt;
 import com.tsys.payments.library.domain.TransactionResponse;
+import com.tsys.payments.library.enums.PinStatementType;
 import com.tsys.payments.library.enums.TransactionResultType;
 import com.tsys.payments.library.enums.TransactionType;
 import java.math.BigDecimal;
@@ -180,6 +181,9 @@ public class TerminalResponse implements IDeviceResponse {
             response.setTerminalVerificationResult(receipt.getTerminalVerificationResult());
             if (receipt.getTransactionAmount() != null) {
                 response.setTransactionAmount((new BigDecimal(receipt.getTransactionAmount())).movePointLeft(2));
+            }
+            if (receipt.getPinStatement() == PinStatementType.PIN_VERIFIED) {
+                response.setCardHolderVerificationMethod(PinStatementType.PIN_VERIFIED.name());
             }
             //            receipt.getTransactionDateTime();
             if (receipt.getTransactionId() != null && !receipt.getTransactionId().isEmpty()) {

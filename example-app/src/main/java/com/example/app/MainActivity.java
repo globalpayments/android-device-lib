@@ -13,12 +13,14 @@ import android.widget.Switch;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import com.globalpayments.library.terminals.ConnectionConfig;
+import com.globalpayments.library.terminals.Credentials;
 import com.globalpayments.library.terminals.c2x.C2XDevice;
 import com.globalpayments.library.terminals.enums.ConnectionMode;
 import com.globalpayments.library.terminals.enums.Environment;
 import com.globalpayments.library.terminals.moby.MobyDevice;
 import com.globalpayments.library.utilities.PermissionHelper;
 import com.globalpayments.library.utilities.PermissionHelper.PermissionsCallBack;
+import com.tsys.payments.library.gateway.enums.GatewayType;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, PermissionsCallBack {
 
@@ -32,6 +34,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public static final String SAVED_SITE_ID = "SAVED_SITE_ID";
     public static final String SAVED_DEVICE_ID = "SAVED_DEVICE_ID";
     public static final String SAVED_LICENSE_ID = "SAVED_LICENSE_ID";
+    public static final String SAVED_MERCHANT_ID = "SAVED_MERCHANT_ID";
+    public static final String SAVED_DEVELOPER_ID = "SAVED_DEVELOPER_ID";
+    public static final String SAVED_TRANSACTION_KEY = "SAVED_TRANSACTION_KEY";
     private static final String TAG = "MainActivity";
     private static final int PERMISSION_REQUEST_CODE = 1;
 
@@ -50,9 +55,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public static String SITE_ID;
     public static String DEVICE_ID;
     public static String LICENSE_ID;
+    public static String MERCHANT_ID;
+    public static String DEVELOPER_ID;
+    public static String TRANSACTION_KEY;
 
     private static boolean isAboutClick = false;
     private Switch environmentSwitch;
+    private Switch gatewaySwitch;
     private Button about;
     private Button disconnect;
     private Switch safSwitch;
@@ -88,6 +97,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         String savedSiteId = sharedPreferences.getString(MainActivity.SAVED_SITE_ID, null);
         String savedDeviceId = sharedPreferences.getString(MainActivity.SAVED_DEVICE_ID, null);
         String savedLicenseId = sharedPreferences.getString(MainActivity.SAVED_LICENSE_ID, null);
+        String savedMerchantId = sharedPreferences.getString(MainActivity.SAVED_MERCHANT_ID, null);
+        String savedDeveloperId = sharedPreferences.getString(MainActivity.SAVED_DEVELOPER_ID, null);
+        String savedTransactionKey = sharedPreferences.getString(MainActivity.SAVED_TRANSACTION_KEY, null);
         if (savedPublicKey != null) {
             PUBLIC_KEY = savedPublicKey;
         }
@@ -106,6 +118,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (savedLicenseId != null) {
             LICENSE_ID = savedLicenseId;
         }
+        if (savedMerchantId != null) {
+            MERCHANT_ID = savedMerchantId;
+        }
+        if (savedDeveloperId != null) {
+            DEVELOPER_ID = savedDeveloperId;
+        }
+        if (savedTransactionKey != null) {
+            TRANSACTION_KEY = savedTransactionKey;
+        }
 
         findViewById(R.id.credentials_button).setOnClickListener(this);
         findViewById(R.id.connect_to_device_button).setOnClickListener(this);
@@ -114,8 +135,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.manual_card_button).setOnClickListener(this);
         findViewById(R.id.transaction_button).setOnClickListener(this);
         findViewById(R.id.ota_update_button).setOnClickListener(this);
-        environmentSwitch = findViewById(R.id.simpleSwitch);
+        environmentSwitch = findViewById(R.id.environment_switch);
         environmentSwitch.setOnClickListener(this);
+        gatewaySwitch = findViewById(R.id.gateway_switch);
+        gatewaySwitch.setOnClickListener(this);
         safSwitch = findViewById(R.id.saf_switch);
         safSwitch.setOnClickListener(this);
         surchargeSwitch = findViewById(R.id.surcharge_switch);
@@ -280,11 +303,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         } else if (view.getId() == R.id.ota_update_button) {
             Intent updateIntent = new Intent(this, OTAUpdateActivity.class);
             startActivity(updateIntent);
-        } else if (view.getId() == R.id.simpleSwitch) {
+        } else if (view.getId() == R.id.environment_switch) {
             if (environmentSwitch.isChecked()) {
                 Toast.makeText(this, "Prod is Selected", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "Test is Selected", Toast.LENGTH_LONG).show();
+            }
+        } else if (view.getId() == R.id.gateway_switch) {
+            if (gatewaySwitch.isChecked()) {
+                Toast.makeText(this, "TransIT is Selected", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Portico is Selected", Toast.LENGTH_LONG).show();
             }
         } else if (view.getId() == R.id.about_button) {
             if (mobyDevice != null && mobyDevice.isConnected()) {
@@ -328,11 +357,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     private ConnectionConfig getConnectionConfig(ConnectionMode connType) {
         ConnectionConfig connectionConfig = new ConnectionConfig();
-        connectionConfig.setUsername(USERNAME);
-        connectionConfig.setPassword(PASSWORD);
-        connectionConfig.setSiteId(SITE_ID);
-        connectionConfig.setDeviceId(DEVICE_ID);
-        connectionConfig.setLicenseId(LICENSE_ID);
+        if (gatewaySwitch.isChecked()) {
+            if (TRANSACTION_KEY != null && !TRANSACTION_KEY.isEmpty()) {
+                connectionConfig.setCredentials(
+                        Credentials.transitCredentials(TRANSACTION_KEY, MERCHANT_ID, DEVICE_ID, DEVELOPER_ID));
+            } else {
+                connectionConfig.setCredentials(
+                        Credentials.transitCredentials(MERCHANT_ID, USERNAME, PASSWORD, DEVICE_ID,
+                                DEVELOPER_ID));
+            }
+        } else {
+            connectionConfig.setCredentials(Credentials.porticoCredentials(USERNAME, LICENSE_ID, SITE_ID,
+                    PASSWORD, DEVICE_ID));
+        }
         connectionConfig.setConnectionMode(connType);
         connectionConfig.setSafEnabled(safSwitch.isChecked());
         connectionConfig.setSafExpirationInDays(5);
@@ -342,6 +379,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             connectionConfig.setSurchargePercent(getCustomSurchargePercent());
         }
         connectionConfig.setEnvironment(environmentSwitch.isChecked() ? Environment.PRODUCTION : Environment.TEST);
+        connectionConfig.setGateway(gatewaySwitch.isChecked() ? GatewayType.TRANSIT : GatewayType.PORTICO);
         return connectionConfig;
     }
 

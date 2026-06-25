@@ -312,19 +312,31 @@ public class C2XDevice implements IDevice {
         terminalConfig.setTimeout(timeout != 0 ? timeout : 60000L);
 
         HashMap<String, String> credentials = new HashMap<>();
-        //        credentials.put("secret_api_key", connectionConfig.getSecretApiKey());
-        credentials.put("version_number", "3409");
-        credentials.put("developer_id", "002914");
-        credentials.put("user_name", connectionConfig.getUsername());
-        credentials.put("license_id", connectionConfig.getLicenseId());
-        credentials.put("site_id", connectionConfig.getSiteId());
-        credentials.put("password", connectionConfig.getPassword());
-        credentials.put("terminal_id", connectionConfig.getDeviceId());
+        if (connectionConfig.getGateway() == GatewayType.PORTICO) {
+            credentials.put("version_number", "3409");
+            credentials.put("developer_id", "002914");
+            credentials.put("user_name", connectionConfig.getCredentials().getUsername());
+            credentials.put("license_id", connectionConfig.getCredentials().getLicenseId());
+            credentials.put("site_id", connectionConfig.getCredentials().getSiteId());
+            credentials.put("password", connectionConfig.getCredentials().getPassword());
+            credentials.put("terminal_id", connectionConfig.getCredentials().getDeviceId());
+        } else {
+            credentials.put("merchant_id", connectionConfig.getCredentials().getMerchantId());
+            credentials.put("user_name", connectionConfig.getCredentials().getUsername());
+            credentials.put("password", connectionConfig.getCredentials().getPassword());
+            credentials.put("device_id", connectionConfig.getCredentials().getDeviceId());
+            credentials.put("developer_id", connectionConfig.getCredentials().getDeveloperId());
+            credentials.put("transaction_key", connectionConfig.getCredentials().getTransactionKey());
+        }
 
         gatewayConfig = new GatewayConfiguration();
-        gatewayConfig.setGatewayType(GatewayType.PORTICO);
+        gatewayConfig.setGatewayType(connectionConfig.getGateway());
         gatewayConfig.setCredentials(credentials);
 
+        if (connectionConfig.isSafEnabled() && connectionConfig.getGateway() == GatewayType.TRANSIT) {
+            //SAF is not yet supported for TransIT
+            throw new Exception("SAF is not yet supported for TransIT");
+        }
         SafDatabaseConfig safDatabaseConfig = new SafDatabaseConfig(connectionConfig.isSafEnabled(),
                 connectionConfig.getSafExpirationInDays(), TimeUnit.DAYS);
         databaseConfig = new DatabaseConfig(applicationContext, "c2xDB", null,

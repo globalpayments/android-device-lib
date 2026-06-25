@@ -2,6 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-06-25
+ 
+### Added
+- Added support for the TransIT gateway.
+### Changed
+
+### Fixed
+
+
 ## [2.0.6] - 2026-06-18
  
 ### Added

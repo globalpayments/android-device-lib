@@ -7,21 +7,25 @@ This Android library lets you connect to a C2X, C3X, or Moby 5500 device and pro
 Maven
 -------------
 ```java
-implementation 'com.globalpayments:android-device-lib:2.0.6'
+implementation 'com.globalpayments:android-device-lib:2.1.0'
 ```
 
 Example App
 -------------
 To use the example app, you'll need to find these variables inside MainActivity:
 ```java
-public static final String PUBLIC_KEY = "YOUR PUBLIC KEY HERE";
-public static final String USERNAME = "YOUR USERNAME HERE";
-public static final String PASSWORD = "YOUR PASSWORD HERE";
-public static final String SITE_ID = "YOUR SITE ID HERE";
-public static final String DEVICE_ID = "YOUR DEVICE ID HERE";
-public static final String LICENSE_ID = "YOUR LICENSE ID HERE";
+public static String PUBLIC_KEY;
+public static String USERNAME;
+public static String PASSWORD;
+public static String SITE_ID;
+public static String DEVICE_ID;
+public static String LICENSE_ID;
+public static String MERCHANT_ID;
+public static String DEVELOPER_ID;
+public static String TRANSACTION_KEY;
 ```
-Simply update the placeholder values with your own credentials and then run the application. The example app will allow you to scan and connect to your C2X or Moby 5500 device, run manual entry transactions, and run card read transactions (using connected C2X or Moby 5500).
+Update the placeholder values with your own credentials and then run the application. When using Portico, you need the USERNAME, PASSWORD, SITE_ID, DEVICE_ID, and LICENSE_ID. For TransIT, you need to set the values for USERNAME, PASSWORD, DEVICE_ID, MERCHANT_ID, and DEVELOPER_ID. Alternatively if you have the TRANSACTION_KEY, you need to set it along with the DEVICE_ID, MERCHANT_ID, and DEVELOPER_ID. 
+The example app will allow you to scan and connect to your C2X or Moby 5500 device, run manual entry transactions, and run card read transactions (using connected C2X or Moby 5500).
 
 SDK Classes
 -------------

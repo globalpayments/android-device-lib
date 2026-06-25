@@ -9,17 +9,16 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import com.globalpayments.library.entities.ReversalReason;
 import com.globalpayments.library.terminals.IDevice;
-import com.globalpayments.library.terminals.transactions.CreditVoidBuilder;
-import static com.example.app.Dialogs.showProgress;
+import com.globalpayments.library.terminals.transactions.CreditReversalBuilder;
 
-public class CreditVoidActivity extends BaseTransactionActivity {
+public class CreditReversalActivity extends BaseTransactionActivity {
 
-    private static final String TAG = "CreditVoidActivity";
+    private static final String TAG = "CreditReversalActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_credit_void);
+        setContentView(R.layout.activity_credit_reversal);
 
         executeButton = findViewById(R.id.execute_button);
 
@@ -29,9 +28,9 @@ public class CreditVoidActivity extends BaseTransactionActivity {
             MainActivity.mobyDevice.setTransactionListener(transactionListener);
         }
 
-        Spinner voidReasonSpinner = findViewById(R.id.creditvoid_voidreason);
+        Spinner reversalReasonSpinner = findViewById(R.id.creditreversal_reversalreason);
         ArrayAdapter<ReversalReason> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, ReversalReason.values());
-        voidReasonSpinner.setAdapter(adapter);
+        reversalReasonSpinner.setAdapter(adapter);
 
         executeButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -52,19 +51,19 @@ public class CreditVoidActivity extends BaseTransactionActivity {
                 }
 
                 String clientTransactionId = ((EditText) findViewById(R.id.client_transaction_id)).getText().toString();
-                boolean allowDuplicates = ((CheckBox) findViewById(R.id.creditvoid_allowduplicates)).isChecked();
-                ReversalReason reversalReason = ReversalReason.values()[((Spinner) findViewById(R.id.creditvoid_voidreason)).getSelectedItemPosition()];
+                boolean allowDuplicates = ((CheckBox) findViewById(R.id.creditreversal_allowduplicates)).isChecked();
+                ReversalReason reversalReason = ReversalReason.values()[((Spinner) findViewById(R.id.creditreversal_reversalreason)).getSelectedItemPosition()];
 
                 IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
-                CreditVoidBuilder creditVoidBuilder = new CreditVoidBuilder(device);
-                creditVoidBuilder.setTransactionId(transactionId);
+                CreditReversalBuilder creditReversalBuilder = new CreditReversalBuilder(device);
+                creditReversalBuilder.setTransactionId(transactionId);
                 if (clientTransactionId != null) {
-                    creditVoidBuilder.setReferenceNumber(clientTransactionId);
+                    creditReversalBuilder.setReferenceNumber(clientTransactionId);
                 }
-                creditVoidBuilder.setReversalReason(reversalReason);
-                creditVoidBuilder.setAllowDuplicates(allowDuplicates);
+                creditReversalBuilder.setReversalReason(reversalReason);
+                creditReversalBuilder.setAllowDuplicates(allowDuplicates);
                 try {
-                    creditVoidBuilder.execute();
+                    creditReversalBuilder.execute();
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }

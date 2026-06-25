@@ -6,20 +6,16 @@ import com.tsys.payments.library.enums.TransactionType;
 
 import com.globalpayments.library.terminals.IDevice;
 
-public class CreditVoidBuilder extends BaseBuilder {
+public class CreditReversalBuilder extends BaseBuilder {
     private String referenceNumber;
     private String transactionId;
     private ReversalReason reversalReason;
 
-   /* public CreditVoidBuilder(C2XDevice device) {
-        super((IDevice) device);
-    }*/
-
     /**
-     * Build Void Transaction
+     * Build Reversal Transaction
      * @param device
      */
-    public CreditVoidBuilder(IDevice device){
+    public CreditReversalBuilder(IDevice device){
         super(device);
     }
 
@@ -27,7 +23,7 @@ public class CreditVoidBuilder extends BaseBuilder {
     protected TransactionRequest buildRequest() {
         TransactionRequest request = super.buildRequest();
 
-        request.setTransactionType(TransactionType.VOID);
+        request.setTransactionType(TransactionType.REVERSAL);
         request.setGatewayTransactionId(transactionId);
         request.setPosReferenceNumber(referenceNumber);
         request.setReversalReason(reversalReason);

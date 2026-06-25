@@ -125,11 +125,18 @@
                 android:text="@string/about" />
 
             <Switch
-                android:id="@+id/simpleSwitch"
+                android:id="@+id/environment_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/environment" />
+
+            <Switch
+                android:id="@+id/gateway_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/gateway" />
 
             <Switch
                 android:id="@+id/saf_switch"

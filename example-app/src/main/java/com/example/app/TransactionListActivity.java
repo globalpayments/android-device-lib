@@ -20,6 +20,7 @@ public class TransactionListActivity extends BaseTransactionActivity implements 
         findViewById(R.id.creditcapture_button).setOnClickListener(this);
         findViewById(R.id.creditreturn_button).setOnClickListener(this);
         findViewById(R.id.creditvoid_button).setOnClickListener(this);
+        findViewById(R.id.creditreversal_button).setOnClickListener(this);
         findViewById(R.id.batchclose_button).setOnClickListener(this);
         findViewById(R.id.giftcard_button).setOnClickListener(this);
         findViewById(R.id.uploadsaf_button).setOnClickListener(this);
@@ -48,6 +49,9 @@ public class TransactionListActivity extends BaseTransactionActivity implements 
             startActivity(intent);
         } else if (view.getId() == R.id.creditvoid_button) {
             intent = new Intent(this, CreditVoidActivity.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.creditreversal_button) {
+            intent = new Intent(this, CreditReversalActivity.class);
             startActivity(intent);
         } else if (view.getId() == R.id.batchclose_button) {
             intent = new Intent(this, BatchCloseActivity.class);

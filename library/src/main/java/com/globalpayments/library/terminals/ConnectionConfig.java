@@ -6,6 +6,7 @@ import com.globalpayments.library.terminals.enums.DataBits;
 import com.globalpayments.library.terminals.enums.Environment;
 import com.globalpayments.library.terminals.enums.Parity;
 import com.globalpayments.library.terminals.enums.StopBits;
+import com.tsys.payments.library.gateway.enums.GatewayType;
 
 public class ConnectionConfig {
     private ConnectionMode connectionMode;
@@ -16,14 +17,7 @@ public class ConnectionConfig {
     private StopBits stopBits;
     private DataBits dataBits;
     private long timeout;
-
-    // credentials
-    private String secretApiKey;
-    private String username;
-    private String licenseId;
-    private String siteId;
-    private String password;
-    private String deviceId;
+    private Credentials credentials;
 
     // Surcharge
     private boolean surchargeEnabled;
@@ -35,10 +29,12 @@ public class ConnectionConfig {
     private int safExpirationInDays;
 
     private Environment environment;
+    private GatewayType gateway;
 
     public ConnectionConfig() {
         timeout = 60000L;
         environment = Environment.TEST;
+        gateway = GatewayType.PORTICO;
     }
 
     public ConnectionMode getConnectionMode() {
@@ -110,57 +106,25 @@ public class ConnectionConfig {
         this.timeout = timeout;
     }
 
-    public String getSecretApiKey() {
-        return secretApiKey;
+    public Credentials getCredentials() {
+        return credentials;
     }
 
-    public void setSecretApiKey(String secretApiKey) {
-        this.secretApiKey = secretApiKey;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getLicenseId() {
-        return licenseId;
-    }
-
-    public void setLicenseId(String licenseId) {
-        this.licenseId = licenseId;
-    }
-
-    public String getSiteId() {
-        return siteId;
-    }
-
-    public void setSiteId(String siteId) {
-        this.siteId = siteId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 
     public Environment getEnvironment() { return environment; }
 
     public void setEnvironment(Environment environment) { this.environment = environment; }
+
+    public GatewayType getGateway() {
+        return gateway;
+    }
+
+    public void setGateway(GatewayType gateway) {
+        this.gateway = gateway;
+    }
 
     public boolean isSafEnabled() {
         return safEnabled;

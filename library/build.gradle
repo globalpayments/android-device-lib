@@ -15,8 +15,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 33
-        versionName "2.0.6"
+        versionCode 34
+        versionName "2.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -70,26 +70,28 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.0-alpha06'
     implementation "androidx.work:work-runtime:2.7.1"
     // Global payments SDK
-    implementation 'com.globalpayments:globalpayments-sdk:15.1.13'
+    implementation 'com.globalpayments:globalpayments-sdk:15.2.0'
 
     /** Vital SDK dependencies - Start **/
     //switch out commented code to change between local and hosted vital libs
     /*api project(path: ':vital-sdk:bbpos')
     api project(path: ':vital-sdk:core')
-    api project(path: ':vital-sdk:ingenico')
+    implementation project(path: ':vital-sdk:ingenico')
     api project(path: ':vital-sdk:portico')
+    api project(path: ':vital-sdk:transit')
     api project(path: ':vital-sdk:roamreader')
     api project(path: ':vital-sdk:transaction-manager')
     api project(path: ':vital-sdk:database-portico')
     api project(path: ':vital-sdk:temlibrary')*/
-    api 'com.globalpayments:globalpayments-bbpos:1.0.9'
-    api 'com.globalpayments:globalpayments-core:1.0.18'
-    api 'com.globalpayments:globalpayments-ingenico:1.0.17'
-    api 'com.globalpayments:globalpayments-portico:1.0.19'
-    api 'com.globalpayments:globalpayments-roamreader:1.0.5'
-    api 'com.globalpayments:globalpayments-temlibrary:1.0.1'
-    api 'com.globalpayments:globalpayments-database-portico:1.0.4'
-    api 'com.globalpayments:globalpayments-transaction-manager:1.0.21'
+    api 'com.globalpayments:globalpayments-bbpos:1.0.10'
+    api 'com.globalpayments:globalpayments-core:1.0.19'
+    implementation 'com.globalpayments:globalpayments-ingenico:1.0.18'
+    api 'com.globalpayments:globalpayments-portico:1.0.20'
+    api 'com.globalpayments:globalpayments-transit:1.0.0'
+    api 'com.globalpayments:globalpayments-roamreader:1.0.6'
+    api 'com.globalpayments:globalpayments-temlibrary:1.0.2'
+    api 'com.globalpayments:globalpayments-database-portico:1.0.5'
+    api 'com.globalpayments:globalpayments-transaction-manager:1.0.22'
 
     // Apache Commons
     //implementation 'commons-codec:commons-codec:1.13'

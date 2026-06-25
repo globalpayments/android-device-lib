@@ -6,12 +6,18 @@ plugins {
 import com.vanniktech.maven.publish.SonatypeHost
 
 configurations.maybeCreate("default")
-def publishArtifact = artifacts.add("default", file('temlibrary-2.6.1.6-release.aar'))
+def isRelease = project.findProperty("isRelease") == "true"
+def buildType = isRelease ? "release" : "debug"
+def aarFile = file("transit-${buildType}.aar")
+if (!aarFile.exists()) {
+    throw new GradleException("AAR not found: ${aarFile}. Did you build it first?")
+}
+def publishArtifact = artifacts.add("default", aarFile)
 
 // Artifact parameters
 def sdkGroupId = 'com.globalpayments'
-def sdkArtifactId = 'globalpayments-temlibrary'
-def sdkVersion = '1.0.2'
+def sdkArtifactId = 'globalpayments-transit'
+def sdkVersion = '1.0.0'
 
 afterEvaluate {
     publishing {
@@ -26,7 +32,7 @@ afterEvaluate {
 
                 pom {
                     name = sdkArtifactId
-                    description = 'TEM library for supporting the Global Payments Android Device Library.'
+                    description = 'Transit library for supporting the Global Payments Android device library.'
                     url = 'https://developer.globalpayments.com/'
 
                     licenses {
@@ -68,8 +74,8 @@ afterEvaluate {
 
         pom {
             name = sdkArtifactId
-            description = 'TEM library for supporting the Global Payments Android Device Library.'
-            url = 'https://developer.globalpay.com/'
+            description = 'Transit library for supporting the Global Payments Android device library.'
+            url = 'https://developer.globalpayments.com/'
             licenses {
                 license {
                     name = 'The MIT License (MIT)'

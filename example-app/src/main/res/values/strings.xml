@@ -16,6 +16,7 @@
     <string name="ota_update">OTA Update</string>
     <string name="about">Provision Version</string>
     <string name="environment">Environment TEST/PROD</string>
+    <string name="gateway">Gateway Portico/TransIT</string>
     <string name="disconnect">Disconnect</string>
     <string name="saf_switch">SAF Toggle</string>
     <string name="surcharge_switch">Surcharge</string>
@@ -59,6 +60,9 @@
     <string name="site_id">Site ID:</string>
     <string name="device_id">Device ID:</string>
     <string name="license_id">License ID:</string>
+    <string name="merchant_id">Merchant ID:</string>
+    <string name="developer_id">Developer ID:</string>
+    <string name="transaction_key">Transaction Key:</string>
     <string name="save">Save</string>
 
     <string name="c2x_connection_label">Bluetooth Connection Status:</string>
@@ -84,6 +88,7 @@
     <string name="tipadjust">Tip Adjust</string>
     <string name="creditreturn">Credit Return</string>
     <string name="creditvoid">Credit Void</string>
+    <string name="creditreversal">Credit Reversal</string>
     <string name="creditadjust">Credit Adjust</string>
     <string name="creditauth">Credit Auth</string>
     <string name="creditcapture">Credit Capture</string>
@@ -111,4 +116,6 @@
     <string name="transaction_id">Transaction ID:</string>
     <string name="token">Token:</string>
     <string name="card_brand_txn_id">Card Brand Txn ID: </string>
+    <string name="void_reason">Void Reason: </string>
+    <string name="reversal_reason">Reversal Reason: </string>
 </resources>

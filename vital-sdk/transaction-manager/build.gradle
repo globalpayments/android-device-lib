@@ -8,7 +8,7 @@ import com.vanniktech.maven.publish.SonatypeHost
 configurations.maybeCreate("default")
 def isRelease = project.findProperty("isRelease") == "true"
 def buildType = isRelease ? "release" : "debug"
-def aarFile = file("transaction-manager-portico-${buildType}.aar")
+def aarFile = file("transaction-manager-unified-${buildType}.aar")
 if (!aarFile.exists()) {
     throw new GradleException("AAR not found: ${aarFile}. Did you build it first?")
 }
@@ -17,7 +17,7 @@ def publishArtifact = artifacts.add("default", aarFile)
 // Artifact parameters
 def sdkGroupId = 'com.globalpayments'
 def sdkArtifactId = 'globalpayments-transaction-manager'
-def sdkVersion = '1.0.21'
+def sdkVersion = '1.0.22'
 
 afterEvaluate {
     publishing {

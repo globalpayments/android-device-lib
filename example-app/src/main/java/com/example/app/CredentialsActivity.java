@@ -24,6 +24,9 @@ public class CredentialsActivity extends BaseActivity {
                 String siteId = ((EditText) findViewById(R.id.site_id)).getText().toString();
                 String deviceId = ((EditText) findViewById(R.id.device_id)).getText().toString();
                 String licenseId = ((EditText) findViewById(R.id.license_id)).getText().toString();
+                String merchantId = ((EditText) findViewById(R.id.merchant_id)).getText().toString();
+                String developerId = ((EditText) findViewById(R.id.developer_id)).getText().toString();
+                String transactionKey = ((EditText) findViewById(R.id.transaction_key)).getText().toString();
 
                 //set the new values
                 MainActivity.PUBLIC_KEY = publicKey;
@@ -32,6 +35,9 @@ public class CredentialsActivity extends BaseActivity {
                 MainActivity.SITE_ID = siteId;
                 MainActivity.DEVICE_ID = deviceId;
                 MainActivity.LICENSE_ID = licenseId;
+                MainActivity.MERCHANT_ID = merchantId;
+                MainActivity.DEVELOPER_ID = developerId;
+                MainActivity.TRANSACTION_KEY = transactionKey;
 
                 //save the new values
                 SharedPreferences.Editor editor =
@@ -42,6 +48,9 @@ public class CredentialsActivity extends BaseActivity {
                 editor.putString(MainActivity.SAVED_SITE_ID, siteId);
                 editor.putString(MainActivity.SAVED_DEVICE_ID, deviceId);
                 editor.putString(MainActivity.SAVED_LICENSE_ID, licenseId);
+                editor.putString(MainActivity.SAVED_MERCHANT_ID, merchantId);
+                editor.putString(MainActivity.SAVED_DEVELOPER_ID, developerId);
+                editor.putString(MainActivity.SAVED_TRANSACTION_KEY, transactionKey);
                 editor.commit();
 
                 finish();
