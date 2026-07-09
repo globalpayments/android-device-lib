@@ -26,6 +26,7 @@ public class TransactionListActivity extends BaseTransactionActivity implements 
         findViewById(R.id.uploadsaf_button).setOnClickListener(this);
         findViewById(R.id.forcesaf_button).setOnClickListener(this);
         findViewById(R.id.test_cancel_button).setOnClickListener(this);
+        findViewById(R.id.test_cancel_saf_button).setOnClickListener(this);
     }
 
     @Override
@@ -78,6 +79,11 @@ public class TransactionListActivity extends BaseTransactionActivity implements 
             device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
             if (device != null) {
                 device.cancelTransaction();
+            }
+        } else if (view.getId() == R.id.test_cancel_saf_button) {
+            device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+            if (device != null) {
+                device.cancelSAFUpload();
             }
         }
     }

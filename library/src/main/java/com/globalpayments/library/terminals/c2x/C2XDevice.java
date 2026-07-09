@@ -358,6 +358,13 @@ public class C2XDevice implements IDevice {
         transactionManager.cancel();
     }
 
+    public void cancelSAFUpload() {
+        if (transactionManager == null) {
+            transactionManager = TransactionManager.getInstance();
+        }
+        transactionManager.cancelUploadSaf();
+    }
+
     //OTA methods
     public void getAvailableTerminalVersions(TerminalUpdateType terminalUpdateType) {
         if (!transactionManager.isInitialized()) {

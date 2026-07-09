@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2026-07-09
+ 
+### Added
+- Added cancelSAFUpload function that end the upload process after the current transaction upload completes.
+### Changed
+- Updated uploadSAF to function separately from other transactions so they can be done at the same time.
+- Updated USB discovery to include delay on device search callback.
+### Fixed
+
+
 ## [2.1.0] - 2026-06-25
  
 ### Added

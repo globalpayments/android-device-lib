@@ -36,6 +36,7 @@
     <string name="error">Error</string>
     <string name="configuration_error">Configuration Error</string>
     <string name="cancel">Cancel</string>
+    <string name="cancel_saf_upload">Cancel SAF Upload</string>
     <string name="email_receipt">Email Receipt</string>
     <string name="error_enter_valid_expiration">Make sure to enter a valid number for the expiration month and year.</string>
     <string name="error_enter_valid_card">Make sure to enter valid credit card information.</string>

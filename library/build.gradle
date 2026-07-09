@@ -15,8 +15,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 34
-        versionName "2.1.0"
+        versionCode 35
+        versionName "2.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -85,13 +85,13 @@ dependencies {
     api project(path: ':vital-sdk:temlibrary')*/
     api 'com.globalpayments:globalpayments-bbpos:1.0.10'
     api 'com.globalpayments:globalpayments-core:1.0.19'
-    implementation 'com.globalpayments:globalpayments-ingenico:1.0.18'
+    implementation 'com.globalpayments:globalpayments-ingenico:1.0.19'
     api 'com.globalpayments:globalpayments-portico:1.0.20'
-    api 'com.globalpayments:globalpayments-transit:1.0.0'
+    api 'com.globalpayments:globalpayments-transit:1.0.1'
     api 'com.globalpayments:globalpayments-roamreader:1.0.6'
     api 'com.globalpayments:globalpayments-temlibrary:1.0.2'
     api 'com.globalpayments:globalpayments-database-portico:1.0.5'
-    api 'com.globalpayments:globalpayments-transaction-manager:1.0.22'
+    api 'com.globalpayments:globalpayments-transaction-manager:1.0.23'
 
     // Apache Commons
     //implementation 'commons-codec:commons-codec:1.13'

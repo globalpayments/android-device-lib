@@ -100,6 +100,9 @@ public class MobyDevice implements IDevice {
     private AlertDialog dialog;
     private boolean isDeviceSelected;
     private boolean isScanned;
+    private final ExecutorService executor =
+            Executors.newSingleThreadExecutor();
+    private boolean bluetoothReceiverRegistered;
 
     private List<Long> safIDs;
 
@@ -341,9 +344,27 @@ public class MobyDevice implements IDevice {
                 bluetoothFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 
                 applicationContext.registerReceiver(bluetoothReceiver, bluetoothFilter);
+                bluetoothReceiverRegistered = true;
             }
         }
         startConnect();
+    }
+
+    /**
+     * Unregister the Bluetooth Receiver
+     */
+    private void unregisterBluetoothReceiver() {
+        if (applicationContext == null || bluetoothReceiver == null || !bluetoothReceiverRegistered) {
+            return;
+        }
+
+        try {
+            applicationContext.unregisterReceiver(bluetoothReceiver);
+        } catch (IllegalArgumentException ex) {
+            Timber.w(ex, "Bluetooth receiver was not registered or already unregistered.");
+        } finally {
+            bluetoothReceiverRegistered = false;
+        }
     }
 
     /**
@@ -370,6 +391,8 @@ public class MobyDevice implements IDevice {
      * Disconnect the connected device
      */
     public void disconnect() {
+        unregisterBluetoothReceiver();
+
         if (isTransactionManagerConnected()) {
             transactionManager.disconnect();
         }
@@ -419,7 +442,6 @@ public class MobyDevice implements IDevice {
                 isScanned = false;
             }
 
-            ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.execute(() -> {
                 initializeTransactionManager();
 
@@ -453,6 +475,8 @@ public class MobyDevice implements IDevice {
 
         }
     }
+
+
 
     /**
      * Is transaction manager connected boolean.
@@ -505,6 +529,13 @@ public class MobyDevice implements IDevice {
             transactionManager = TransactionManager.getInstance();
         }
         transactionManager.cancel();
+    }
+
+    public void cancelSAFUpload() {
+        if (transactionManager == null) {
+            transactionManager = TransactionManager.getInstance();
+        }
+        transactionManager.cancelUploadSaf();
     }
 
     //OTA methods
@@ -658,6 +689,7 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onDiscoveryFinished() {
+            unregisterBluetoothReceiver();
             if (deviceListener == null) {
                 return;
             }
