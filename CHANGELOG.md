@@ -2,6 +2,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] - 2026-07-23
+ 
+### Added
+
+### Changed
+
+### Fixed
+- Updated error handling for invalid transaction ID for SAF transactions so they are not kept in the pending list and the upload process continues.
+- Updates for SAF items to prevent trackdata from being empty.
+
+
 ## [2.1.1] - 2026-07-09
  
 ### Added
