@@ -28,6 +28,9 @@ public class ConnectionConfig {
     private boolean safEnabled;
     private int safExpirationInDays;
 
+    // moby-specific
+    private boolean mobyAutoRebootDisabled = false;
+
     private Environment environment;
     private GatewayType gateway;
 
@@ -164,5 +167,13 @@ public class ConnectionConfig {
 
     public void setSurchargePercent(float surchargePercent) {
         this.surchargePercent = surchargePercent;
+    }
+
+    public boolean isMobyAutoRebootDisabled() {
+        return mobyAutoRebootDisabled;
+    }
+
+    public void setMobyAutoRebootDisabled(boolean mobyAutoRebootDisabled) {
+        this.mobyAutoRebootDisabled = mobyAutoRebootDisabled;
     }
 }

@@ -2,6 +2,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.4] - 2026-08-27
+ 
+### Added
+- Added setMobyAutoRebootDisabled to ConnectionConfig. Setting this to true will clear the scheduled reboots (Moby devices only).
+- Added resetDevice to MobyDevice which reboots the moby device when called.
+### Changed
+- Updated error handling for SAF upload to keep transactions from incorrectly being removed from pending list.
+- Updated handling for SYSTEM ERROR issuer response code so that the transaction is kept in the pending list.
+- Updated Ingenico SDK from version 2.6.1.6 to 2.6.1.7.
+### Fixed
+- Updated USB logic for Moby to prevent reboots from putting the device in a bad state and preventing reconnection.
+- Fixed ConcurrentModificationException that could occur when doing a sale immediately after connecting.
+- Fixed issue with production toggle not working correctly for TransIT.
+
+
 ## [2.1.2] - 2026-07-23
  
 ### Added

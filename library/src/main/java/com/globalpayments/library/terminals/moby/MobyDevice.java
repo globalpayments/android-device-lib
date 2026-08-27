@@ -81,7 +81,7 @@ public class MobyDevice implements IDevice {
     private static final String TAG = MobyDevice.class.getSimpleName();
 
     private static boolean timberPlanted;
-    private TransactionManager transactionManager;
+    private final TransactionManager transactionManager;
     private Context applicationContext;
     private Context mobyPairingContext;
     private ConnectionConfig connectionConfig;
@@ -113,6 +113,7 @@ public class MobyDevice implements IDevice {
      */
     public MobyDevice(Context context) {
         this.applicationContext = context;
+        this.transactionManager = TransactionManager.getInstance();
     }
 
     /**
@@ -124,6 +125,7 @@ public class MobyDevice implements IDevice {
     public MobyDevice(Context context, ConnectionConfig config) throws Exception {
         this.applicationContext = context;
         this.setConnectionConfig(config);
+        this.transactionManager = TransactionManager.getInstance();
     }
 
     /**
@@ -136,6 +138,7 @@ public class MobyDevice implements IDevice {
 
         LibraryConfigHelper.setDebugMode(connectionConfig.getEnvironment().equals(Environment.TEST));
         LibraryConfigHelper.setSdkNameVersion("android;version=" + BuildConfig.VERSION_NAME);
+        LibraryConfigHelper.setMobyAutoRebootDisabled(connectionConfig.isMobyAutoRebootDisabled());
         if (connectionConfig.getEnvironment().equals(Environment.TEST) && !timberPlanted) {
             Timber.plant(new Timber.DebugTree());
             timberPlanted = true;
@@ -238,9 +241,6 @@ public class MobyDevice implements IDevice {
 
     @Override
     public void uploadSAF() {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
-        }
         transactionManager.processAllSafTransactions(new SafListenerImpl());
     }
 
@@ -262,9 +262,6 @@ public class MobyDevice implements IDevice {
      */
     @Override
     public void setForcedSafEnabled(boolean forcedSaf) {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
-        }
         transactionManager.setForceSafEnabled(forcedSaf);
     }
 
@@ -326,6 +323,12 @@ public class MobyDevice implements IDevice {
             default:
                 scan();
                 break;
+        }
+    }
+
+    public void resetDevice() {
+        if (isTransactionManagerConnected()) {
+            transactionManager.resetDevice();
         }
     }
 
@@ -484,18 +487,11 @@ public class MobyDevice implements IDevice {
      * @return the boolean
      */
     protected boolean isTransactionManagerConnected() {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
-        }
-        return transactionManager != null && transactionManager.isConnected();
+        return transactionManager.isConnected();
     }
 
     @Override
     public void doTransaction(TransactionRequest transactionRequest) {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
-        }
-
         if (!transactionManager.isInitialized()) {
             initializeTransactionManager();
         }
@@ -509,10 +505,6 @@ public class MobyDevice implements IDevice {
      * function onTransactionComplete().
      */
     public void doSvaStartCard() {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
-        }
-
         if (!transactionManager.isInitialized()) {
             initializeTransactionManager();
         }
@@ -525,16 +517,10 @@ public class MobyDevice implements IDevice {
      * Cancel the current transaction. No effect if there is no transaction active.
      */
     public void cancelTransaction() {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
-        }
         transactionManager.cancel();
     }
 
     public void cancelSAFUpload() {
-        if (transactionManager == null) {
-            transactionManager = TransactionManager.getInstance();
-        }
         transactionManager.cancelUploadSaf();
     }
 
@@ -791,7 +777,6 @@ public class MobyDevice implements IDevice {
             if (deviceListener != null) {
                 deviceListener.onDisconnected();
             }
-            transactionManager = null;
         }
 
         @Override
