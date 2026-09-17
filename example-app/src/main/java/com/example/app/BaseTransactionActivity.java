@@ -13,6 +13,7 @@ import com.globalpayments.library.terminals.entities.TerminalResponse;
 import com.globalpayments.library.terminals.enums.ErrorType;
 import com.globalpayments.library.terminals.enums.TransactionStatus;
 import com.tsys.payments.library.enums.CardholderInteractionType;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import static com.example.app.Dialogs.hideProgress;
 import static com.example.app.Dialogs.showProgress;
@@ -21,9 +22,14 @@ public abstract class BaseTransactionActivity extends BaseActivity {
 
     private static final String TAG = "BaseTransactionActivity";
 
+    protected BigDecimal currentAmount;
+    protected BigDecimal currentTaxAmount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentAmount = null;
+        currentTaxAmount = null;
     }
 
     /*protected void updateTransactionStatus() {
@@ -89,13 +95,43 @@ public abstract class BaseTransactionActivity extends BaseActivity {
                 case SURCHARGE_REQUESTED:
                     result = new CardholderInteractionResult(
                             CardholderInteractionType.CARDHOLDER_SURCHARGE_CONFIRMATION);
-                    String surchargeAmount = NumberFormat.getCurrencyInstance().format((float)cardholderInteractionRequest.getFinalSurchargeAmount()/100);
+
+                    //perform your own calculations for the surcharge amount, tax amount, and total amount
+                    BigDecimal finalTaxAmount;
+                    BigDecimal finalSurchargeAmount;
+                    BigDecimal finalAmount;
+                    if (currentTaxAmount != null) {
+                        //remove tax from total before calculating surcharge
+                        BigDecimal nonTaxTotal = currentAmount.subtract(currentTaxAmount);
+                        //calculate surcharge (example uses 3%)
+                        finalSurchargeAmount = nonTaxTotal.multiply(BigDecimal.valueOf(0.03));
+                        //calculate tax amount increase caused by surcharge (example uses 7% tax rate)
+                        finalTaxAmount = currentTaxAmount.add(finalSurchargeAmount.multiply(BigDecimal.valueOf(0.07)));
+                        //calculate the final total
+                        finalAmount = nonTaxTotal.add(finalSurchargeAmount).add(finalTaxAmount);
+                    } else {
+                        //calculation without taxes (example uses surcharge of 3%)
+                        finalSurchargeAmount = currentAmount.multiply(BigDecimal.valueOf(0.03));
+                        finalAmount = currentAmount.add(finalSurchargeAmount);
+                        finalTaxAmount = BigDecimal.valueOf(0);
+                    }
+
+                    //example: $10.70 total with $0.70 tax amount before surcharge
+                    //nonTaxTotal will be $10
+                    //finalSurchargeAmount will be $0.30
+                    //finalTaxAmount will be $0.72
+                    //finalAmount will be $11.02
+
+                    String surchargeAmount = NumberFormat.getCurrencyInstance().format(finalSurchargeAmount);
                     Dialogs.showListDialog("Confirm Surcharge amount of " + surchargeAmount,
                             BaseTransactionActivity.this, new String[] {"Accept", "Decline"},
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     result.setFinalAmountConfirmed(i == 0);
+                                    result.setFinalSurchargeAmount(finalSurchargeAmount);
+                                    result.setFinalAmount(finalAmount);
+                                    result.setFinalTaxAmount(finalTaxAmount);
                                     if(MainActivity.c2XDevice != null) {
                                         MainActivity.c2XDevice.sendCardholderInteractionResult(result);
                                     } else {

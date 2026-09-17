@@ -66,6 +66,8 @@ public class CreditSaleActivity extends BaseTransactionActivity {
                 IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
                 CreditSaleBuilder creditSaleBuilder = new CreditSaleBuilder(device);
                 creditSaleBuilder.setAmount(new BigDecimal(amount));
+                currentAmount = new BigDecimal(amount);
+                currentTaxAmount = null;
                 if (gratuity != null && !gratuity.isEmpty()) {
                     creditSaleBuilder.setGratuity(new BigDecimal(gratuity));
                 }
@@ -83,6 +85,7 @@ public class CreditSaleActivity extends BaseTransactionActivity {
                 }
                 if (taxAmount != null && !taxAmount.isEmpty()) {
                     creditSaleBuilder.setTaxAmount(new BigDecimal(taxAmount));
+                    currentTaxAmount = new BigDecimal(taxAmount);
                 }
                 creditSaleBuilder.setAllowDuplicates(allowDuplicates);
                 creditSaleBuilder.setRequestToken(requestToken);

@@ -56,7 +56,7 @@ dependencies {
     implementation "androidx.work:work-runtime:2.7.1"
     //switch out commented code to change between local and hosted SDK
     //implementation project(path: ':library')
-    implementation 'com.globalpayments:android-device-lib:2.1.4'
+    implementation 'com.globalpayments:android-device-lib:2.1.5'
 
     // Timber Logging: https://github.com/JakeWharton/timber
     implementation 'com.jakewharton.timber:timber:4.7.1'

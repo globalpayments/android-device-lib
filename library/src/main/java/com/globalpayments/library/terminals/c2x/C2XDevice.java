@@ -284,7 +284,9 @@ public class C2XDevice implements IDevice {
         }
 
         LibraryConfigHelper.setSurchargeEnabled(connectionConfig.isSurchargeEnabled());
-        LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
+
+        //Surcharge rate is handled by the application now
+        /*LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
         if (LibraryConfigHelper.isSurchargeEnabled()) {
             //can ignore any custom value if surcharge isn't even enabled
             boolean surchargePercentUpdate =
@@ -292,7 +294,7 @@ public class C2XDevice implements IDevice {
             if (!surchargePercentUpdate) {
                 throw new Exception(applicationContext.getString(R.string.invalid_surcharge_amount));
             }
-        }
+        }*/
 
         transactionConfig = new TransactionConfiguration();
         transactionConfig.setChipEnabled(true);
@@ -440,7 +442,6 @@ public class C2XDevice implements IDevice {
         cr.setCardholderInteractionType(info.getCardholderInteractionType());
         cr.setCommercialCardDataFields(info.getCommercialCardDataFields());
         cr.setFinalTransactionAmount(info.getFinalTransactionAmount());
-        cr.setSurchargeAmount(info.getFinalSurchargeAmount());
         cr.setSupportedApplications(info.getSupportedApplications());
         return cr;
     }
@@ -451,6 +452,9 @@ public class C2XDevice implements IDevice {
         result.setCommercialCardData(info.getCommercialCardData());
         result.setFinalAmountConfirmed(info.getFinalAmountConfirmed());
         result.setSelectedAidIndex(info.getSelectedAidIndex());
+        result.setFinalTaxAmount(info.getFinalTaxAmount());
+        result.setFinalSurchargeAmount(info.getFinalSurchargeAmount());
+        result.setFinalAmount(info.getFinalAmount());
         return result;
     }
 
@@ -560,13 +564,6 @@ public class C2XDevice implements IDevice {
         @Override
         public void onCardholderInteractionRequested(CardholderInteractionRequest cardholderInteractionRequest) {
             if (transactionListener != null) {
-                if(cardholderInteractionRequest.getCardholderInteractionType() ==
-                        CardholderInteractionType.SURCHARGE_REQUESTED){
-                    Long surcharge = cardholderInteractionRequest.getFinalSurchargeAmount();
-                    Long finalAmount = cardholderInteractionRequest.getFinalTransactionAmount();
-                    cardholderInteractionRequest.setSurchargeAmount(surcharge);
-                    cardholderInteractionRequest.setFinalTransactionAmount(finalAmount);
-                }
                 boolean interactionHandled = transactionListener.onCardholderInteractionRequested(map(cardholderInteractionRequest));
                 if (!interactionHandled) {
                     CardholderInteractionResult result;

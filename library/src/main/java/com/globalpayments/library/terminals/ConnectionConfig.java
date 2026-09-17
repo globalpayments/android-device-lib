@@ -21,8 +21,6 @@ public class ConnectionConfig {
 
     // Surcharge
     private boolean surchargeEnabled;
-    private boolean surchargePreTax;
-    private float surchargePercent = 3.0f;
 
     // saf options
     private boolean safEnabled;
@@ -151,22 +149,6 @@ public class ConnectionConfig {
 
     public void setSurchargeEnabled(boolean surchargeEnabled) {
         this.surchargeEnabled = surchargeEnabled;
-    }
-
-    public boolean isSurchargePreTax() {
-        return surchargePreTax;
-    }
-
-    public void setSurchargePreTax(boolean surchargePreTax) {
-        this.surchargePreTax = surchargePreTax;
-    }
-
-    public float getSurchargePercent() {
-        return surchargePercent;
-    }
-
-    public void setSurchargePercent(float surchargePercent) {
-        this.surchargePercent = surchargePercent;
     }
 
     public boolean isMobyAutoRebootDisabled() {

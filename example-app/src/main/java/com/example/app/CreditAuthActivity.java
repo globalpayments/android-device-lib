@@ -55,6 +55,8 @@ public class CreditAuthActivity extends BaseTransactionActivity {
                 IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
                 CreditAuthBuilder creditAuthBuilder = new CreditAuthBuilder(device);
                 creditAuthBuilder.setAmount(new BigDecimal(amount));
+                currentAmount = new BigDecimal(amount);
+                currentTaxAmount = null;
                 if (gratuity != null && !gratuity.isEmpty()) {
                     creditAuthBuilder.setGratuity(new BigDecimal(gratuity));
                 }
@@ -68,6 +70,7 @@ public class CreditAuthActivity extends BaseTransactionActivity {
                 }
                 if (taxAmount != null && !taxAmount.isEmpty()) {
                     creditAuthBuilder.setTaxAmount(new BigDecimal(taxAmount));
+                    currentTaxAmount = new BigDecimal(taxAmount);
                 }
                 creditAuthBuilder.setAllowDuplicates(allowDuplicates);
                 try {

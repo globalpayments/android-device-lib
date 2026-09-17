@@ -2,6 +2,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.5] - 2026-09-17
+ 
+### Added
+
+### Changed
+- Update surcharge functionality so the SDK no longer calculates the surcharge amount and the application is responsible for calculating the final amounts for total, tax, and surcharge (the example-app shows an example of this) (AH-2551). 
+### Fixed
+- Fixed issue with cancel transaction (AH-3040).
+- Fixed SAF handling for tip adjust on declined transaction (AH-3075).
+- Fixed issue with manual disconnect not allowing credential changes for next initialize (AH-3083).
+
+
 ## [2.1.4] - 2026-08-27
  
 ### Added

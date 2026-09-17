@@ -60,6 +60,10 @@ import com.tsys.payments.library.enums.TransactionType;
 import com.tsys.payments.library.exceptions.Error;
 import com.tsys.payments.library.exceptions.InitializationException;
 import com.tsys.payments.library.gateway.enums.GatewayType;
+import com.tsys.payments.library.logging.GPLibraryLogger.GPLibraryLogCallback;
+import com.tsys.payments.library.logging.GPLibraryLogLevel;
+import com.tsys.payments.library.logging.GPLibraryLogManager;
+import com.tsys.payments.library.logging.GPLibraryLogType;
 import com.tsys.payments.library.terminal.TerminalInfoListener;
 import com.tsys.payments.library.utils.LibraryConfigHelper;
 import com.tsys.payments.transaction.TransactionManager;
@@ -145,7 +149,9 @@ public class MobyDevice implements IDevice {
         }
 
         LibraryConfigHelper.setSurchargeEnabled(connectionConfig.isSurchargeEnabled());
-        LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
+
+        //Surcharge rate is handled by the application now
+        /*LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
         if (LibraryConfigHelper.isSurchargeEnabled()) {
             //can ignore any custom value if surcharge isn't even enabled
             boolean surchargePercentUpdate =
@@ -153,7 +159,7 @@ public class MobyDevice implements IDevice {
             if (!surchargePercentUpdate) {
                 throw new Exception(applicationContext.getString(R.string.invalid_surcharge_amount));
             }
-        }
+        }*/
 
         transactionConfig = new TransactionConfiguration();
         transactionConfig.setQuickChipEnabled(true);
@@ -203,6 +209,7 @@ public class MobyDevice implements IDevice {
         gatewayConfig = new GatewayConfiguration();
         gatewayConfig.setGatewayType(connectionConfig.getGateway());
         gatewayConfig.setCredentials(credentials);
+        gatewayConfig.setLibraryLogger(GPLibraryLogManager.getLibraryLogger());
 
         if (connectionConfig.isSafEnabled() && connectionConfig.getGateway() == GatewayType.TRANSIT) {
             //SAF is not yet supported for TransIT
@@ -313,6 +320,25 @@ public class MobyDevice implements IDevice {
     }
 
     /**
+     * Sets the library log callback used by {@link GPLibraryLogManager}.
+     * This callback is global, not scoped to a single {@code MobyDevice} instance.
+     * Setting it here replaces any callback previously set by another device instance.
+     *
+     * @param logCallback the global library log callback
+     */
+    public void setLogCallback(GPLibraryLogCallback logCallback) {
+        GPLibraryLogManager.setLibraryLogger(logCallback);
+    }
+
+    /**
+     * Removes the library log callback from {@link GPLibraryLogManager}.
+     * This clears the global callback for all instances.
+     */
+    public void removeLogCallback() {
+        GPLibraryLogManager.clearLibraryLogger();
+    }
+
+    /**
      * Initialize is used to start the connection
      */
     public void initialize() {
@@ -364,7 +390,8 @@ public class MobyDevice implements IDevice {
         try {
             applicationContext.unregisterReceiver(bluetoothReceiver);
         } catch (IllegalArgumentException ex) {
-            Timber.w(ex, "Bluetooth receiver was not registered or already unregistered.");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.WARNING, GPLibraryLogType.DEVICE, TAG,
+                    "Bluetooth receiver error", ex.toString());
         } finally {
             bluetoothReceiverRegistered = false;
         }
@@ -377,6 +404,8 @@ public class MobyDevice implements IDevice {
      */
     public void connect(String deviceName) {
         terminalConfig.setHost(deviceName);
+        GPLibraryLogManager.emit(GPLibraryLogLevel.INFO, GPLibraryLogType.DEVICE, TAG,
+                "connect() called", deviceName);
         startConnect();
     }
 
@@ -395,6 +424,8 @@ public class MobyDevice implements IDevice {
      */
     public void disconnect() {
         unregisterBluetoothReceiver();
+        GPLibraryLogManager.emit(GPLibraryLogLevel.INFO, GPLibraryLogType.DEVICE, TAG,
+                "disconnect() called", null);
 
         if (isTransactionManagerConnected()) {
             transactionManager.disconnect();
@@ -421,7 +452,8 @@ public class MobyDevice implements IDevice {
     }
 
     private void startConnect() {
-        Timber.d("startConnect() called.");
+        GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.DEVICE, TAG,
+                "startConnect() called", null);
         if (isTransactionManagerConnected()) {
             return;
         }
@@ -449,7 +481,8 @@ public class MobyDevice implements IDevice {
                 initializeTransactionManager();
 
                 if (transactionManager.isInitialized()) {
-                    Timber.d("TransactionManager isInitialized() called");
+                    GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.DEVICE, TAG,
+                            "TransactionManager isInitialized() called", null);
                     transactionManager.connect(new ConnectionListenerImpl());
                     transactionManager.updateTransactionListener(new TransactionListenerImpl());
                 }
@@ -492,6 +525,9 @@ public class MobyDevice implements IDevice {
 
     @Override
     public void doTransaction(TransactionRequest transactionRequest) {
+        GPLibraryLogManager.emit(GPLibraryLogLevel.INFO, GPLibraryLogType.TRANSACTION, TAG,
+                "doTransaction() called", null);
+
         if (!transactionManager.isInitialized()) {
             initializeTransactionManager();
         }
@@ -527,11 +563,13 @@ public class MobyDevice implements IDevice {
     //OTA methods
     public void getAvailableTerminalVersions(TerminalUpdateType terminalUpdateType) {
         if (!transactionManager.isInitialized()) {
-            Log.e(TAG, "TransactionManager not initialized, please connect to device first.");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.DEVICE, TAG,
+                    "TransactionManager not initialized, please connect to device first.", null);
             return;
         }
         if (availableTerminalVersionsListener == null) {
-            Log.e(TAG, "AvailableTerminalVersionsListener is null, please set a valid listener.");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.DEVICE, TAG,
+                    "AvailableTerminalVersionsListener is null, please set a valid listener.", null);
             return;
         }
 
@@ -547,11 +585,13 @@ public class MobyDevice implements IDevice {
     public void updateTerminal(@NonNull TerminalUpdateType terminalUpdateType,
             @Nullable String version) {
         if (!transactionManager.isInitialized()) {
-            Log.e(TAG, "TransactionManager not initialized, please connect to device first.");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.DEVICE, TAG,
+                    "TransactionManager not initialized, please connect to device first.", version);
             return;
         }
         if (updateTerminalListener == null) {
-            Log.e(TAG, "UpdateTerminalListener is null, please set a valid listener.");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.DEVICE, TAG,
+                    "UpdateTerminalListener is null, please set a valid listener.", version);
             return;
         }
 
@@ -601,7 +641,6 @@ public class MobyDevice implements IDevice {
         cr.setCardholderInteractionType(info.getCardholderInteractionType());
         cr.setCommercialCardDataFields(info.getCommercialCardDataFields());
         cr.setFinalTransactionAmount(info.getFinalTransactionAmount());
-        cr.setSurchargeAmount(info.getFinalSurchargeAmount());
         cr.setSupportedApplications(info.getSupportedApplications());
         return cr;
     }
@@ -612,6 +651,9 @@ public class MobyDevice implements IDevice {
         result.setCommercialCardData(info.getCommercialCardData());
         result.setFinalAmountConfirmed(info.getFinalAmountConfirmed());
         result.setSelectedAidIndex(info.getSelectedAidIndex());
+        result.setFinalTaxAmount(info.getFinalTaxAmount());
+        result.setFinalSurchargeAmount(info.getFinalSurchargeAmount());
+        result.setFinalAmount(info.getFinalAmount());
         return result;
     }
 
@@ -731,12 +773,14 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onNotSupported() {
-            Timber.d("MobyDevice callback :: LedPairingCallback -> notSupported");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.DEVICE, TAG,
+                    "MobyDevice callback :: LedPairingCallback -> notSupported", null);
         }
 
         @Override
         public void onSuccess() {
-            Timber.d("MobyDevice callback :: LedPairingCallback -> success");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.DEVICE, TAG,
+                    "MobyDevice callback :: LedPairingCallback -> success", null);
         }
 
         @Override
@@ -748,7 +792,8 @@ public class MobyDevice implements IDevice {
                 java.lang.Error err = new java.lang.Error("Pairing Failed");
                 deviceListener.onError(err, ErrorType.NOT_CONNECTED);
             }
-            Timber.d("MobyDevice callback  :: LedPairingCallback -> failed");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.DEVICE, TAG,
+                    "MobyDevice callback :: LedPairingCallback -> failed", null);
         }
 
         @Override
@@ -757,7 +802,8 @@ public class MobyDevice implements IDevice {
                 java.lang.Error err = new java.lang.Error("Pairing Canceled");
                 deviceListener.onError(err, ErrorType.NOT_CONNECTED);
             }
-            Timber.d("MobyDevice callback :: LedPairingCallback -> canceled");
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.DEVICE, TAG,
+                    "MobyDevice callback :: LedPairingCallback -> canceled", null);
         }
     }
 
@@ -767,6 +813,8 @@ public class MobyDevice implements IDevice {
     protected class ConnectionListenerImpl implements ConnectionListener {
         @Override
         public void onConnected(TerminalInfo terminalInfo) {
+            GPLibraryLogManager.emit(GPLibraryLogLevel.INFO, GPLibraryLogType.DEVICE, TAG,
+                    "Device connected", terminalInfo.getSerialNumber());
             if (deviceListener != null) {
                 deviceListener.onConnected(map(terminalInfo));
             }
@@ -774,6 +822,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onDisconnected() {
+            GPLibraryLogManager.emit(GPLibraryLogLevel.WARNING, GPLibraryLogType.DEVICE, TAG,
+                    "Device disconnected", null);
             if (deviceListener != null) {
                 deviceListener.onDisconnected();
             }
@@ -781,6 +831,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onError(Error error) {
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.DEVICE, TAG,
+                    "Connection error", error.getMessage());
             if (deviceListener != null) {
                 java.lang.Error err = new java.lang.Error(error.getMessage());
                 ErrorType errorType = map(error.getType());
@@ -795,6 +847,9 @@ public class MobyDevice implements IDevice {
     protected class TransactionListenerImpl implements com.tsys.payments.library.transaction.TransactionListener {
         @Override
         public void onStatusUpdate(TransactionStatus transactionStatus) {
+            GPLibraryLogManager.emit(GPLibraryLogLevel.INFO, GPLibraryLogType.TRANSACTION, TAG,
+                    "Transaction status update",
+                    String.valueOf(transactionStatus));
             if (transactionListener != null) {
                 transactionListener.onStatusUpdate(
                         com.globalpayments.library.terminals.enums.TransactionStatus.fromVitalSdk(
@@ -807,13 +862,6 @@ public class MobyDevice implements IDevice {
         public void onCardholderInteractionRequested(CardholderInteractionRequest cardholderInteractionRequest) {
 
             if (transactionListener != null) {
-                if(cardholderInteractionRequest.getCardholderInteractionType() ==
-                        CardholderInteractionType.SURCHARGE_REQUESTED){
-                    Long surcharge = cardholderInteractionRequest.getFinalSurchargeAmount();
-                    Long finalAmount = cardholderInteractionRequest.getFinalTransactionAmount();
-                    cardholderInteractionRequest.setSurchargeAmount(surcharge);
-                    cardholderInteractionRequest.setFinalTransactionAmount(finalAmount);
-                }
                 boolean interactionHandled = transactionListener.onCardholderInteractionRequested(map(cardholderInteractionRequest));
                 if (!interactionHandled) {
                     CardholderInteractionResult result;
@@ -833,7 +881,9 @@ public class MobyDevice implements IDevice {
                                     CardholderInteractionType.CARDHOLDER_SURCHARGE_CONFIRMATION);
                             result.setFinalAmountConfirmed(false);
                             sendCardholderInteractionResult(result);
-                            Timber.e("Surcharge confirmation was not handled by client application, cancelling transaction");
+                            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.TRANSACTION, TAG,
+                                    "Surcharge confirmation was not handled by client application, cancelling transaction",
+                                    null);
                             break;
                         case FINAL_AMOUNT_CONFIRMATION:
                             result = new CardholderInteractionResult(
@@ -851,8 +901,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onTransactionComplete(TransactionResponse transactionResponse) {
-            Timber.d("onTransactionComplete - " + transactionResponse);
-            Timber.d("onTransactionComplete id - " + transactionResponse.getPosReferenceNumber());
+            GPLibraryLogManager.emit(GPLibraryLogLevel.INFO, GPLibraryLogType.TRANSACTION, TAG,
+                    "Transaction complete", String.valueOf(transactionResponse));
             if (transactionResponse.getTransactionResult() == TransactionResultType.SAF) {
                 safIDs.add(Long.valueOf(transactionResponse.getPosReferenceNumber()));
             }
@@ -864,6 +914,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onError(Error error) {
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.TRANSACTION, TAG,
+                    "Transaction error", error.getMessage());
             if (transactionListener != null) {
                 java.lang.Error err = new java.lang.Error(error.getMessage());
                 ErrorType errorType = map(error.getType());
@@ -901,9 +953,11 @@ public class MobyDevice implements IDevice {
     protected class SafListenerImpl implements com.tsys.payments.library.db.SafListener {
         @Override
         public void onProcessingComplete(List<TransactionResponse> responses) {
-            Timber.d("onProcessingComplete - count - " + responses.size());
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.TRANSACTION, TAG,
+                    "SAF processing complete", "Count: " + responses.size());
             for (TransactionResponse transactionResponse : responses) {
-                Timber.d("response: " + transactionResponse);
+                GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.TRANSACTION, TAG,
+                        "SAF transaction response", String.valueOf(transactionResponse));
             }
             if (safListener != null) {
                 safListener.onProcessingComplete(responses);
@@ -912,7 +966,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onAllSafTransactionsRetrieved(List<SafTransaction> obfuscatedSafTransactions) {
-            Timber.d("onAllSafTransactionsRetrieved - count - " + obfuscatedSafTransactions.size());
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.TRANSACTION, TAG,
+                    "All SAF transactions retrieved", "Count: " + obfuscatedSafTransactions.size());
             if (safListener != null) {
                 safListener.onAllSafTransactionsRetrieved(obfuscatedSafTransactions);
             }
@@ -920,7 +975,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onError(Error error) {
-            Timber.d("onError - " + error);
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.TRANSACTION, TAG,
+                    "SAF error", error.getMessage());
             if (safListener != null) {
                 safListener.onError(new java.lang.Error(error.getMessage()));
             }
@@ -928,7 +984,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onTransactionStored(String id, int totalCount, BigDecimal totalAmount) {
-            Timber.d("onTransactionStored - id - " + id + ", count - " + totalCount + ", amount - " + totalAmount);
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.TRANSACTION, TAG,
+                    "Transaction stored", "id=" + id + ", count=" + totalCount + ", amount=" + totalAmount);
             if (safListener != null) {
                 safListener.onTransactionStored(id, totalCount, totalAmount);
             }
@@ -936,7 +993,8 @@ public class MobyDevice implements IDevice {
 
         @Override
         public void onStoredTransactionComplete(String id, TransactionResponse transactionResponse) {
-            Timber.d("onStoredTransactionComplete - id - " + id + ", response - " + transactionResponse);
+            GPLibraryLogManager.emit(GPLibraryLogLevel.DEBUG, GPLibraryLogType.TRANSACTION, TAG,
+                    "Stored transaction complete", "id=" + id + ", response=" + transactionResponse);
             if (safListener != null) {
                 safListener.onStoredTransactionComplete(id, transactionResponse);
             }
