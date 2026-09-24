@@ -96,8 +96,16 @@ public abstract class BaseTransactionActivity extends BaseActivity {
                     result = new CardholderInteractionResult(
                             CardholderInteractionType.CARDHOLDER_SURCHARGE_CONFIRMATION);
 
+                    //OLD SURCHARGE
+                    String surchargeAmount = NumberFormat.getCurrencyInstance().format((float)cardholderInteractionRequest.getFinalSurchargeAmount()/100);
+                    //example for pre-tax with 2.5% surcharge: $10.70 total with $0.70 tax amount before surcharge
+                    //nonTaxTotal will be $10
+                    //finalSurchargeAmount will be $0.25
+                    //finalAmount will be $10.95
+
+                    //NEW SURCHARGE
                     //perform your own calculations for the surcharge amount, tax amount, and total amount
-                    BigDecimal finalTaxAmount;
+                    /*BigDecimal finalTaxAmount;
                     BigDecimal finalSurchargeAmount;
                     BigDecimal finalAmount;
                     if (currentTaxAmount != null) {
@@ -122,16 +130,20 @@ public abstract class BaseTransactionActivity extends BaseActivity {
                     //finalTaxAmount will be $0.72
                     //finalAmount will be $11.02
 
-                    String surchargeAmount = NumberFormat.getCurrencyInstance().format(finalSurchargeAmount);
+                    String surchargeAmount = NumberFormat.getCurrencyInstance().format(finalSurchargeAmount);*/
+
                     Dialogs.showListDialog("Confirm Surcharge amount of " + surchargeAmount,
                             BaseTransactionActivity.this, new String[] {"Accept", "Decline"},
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     result.setFinalAmountConfirmed(i == 0);
-                                    result.setFinalSurchargeAmount(finalSurchargeAmount);
+
+                                    //NEW SURCHARGE
+                                    /*result.setFinalSurchargeAmount(finalSurchargeAmount);
                                     result.setFinalAmount(finalAmount);
-                                    result.setFinalTaxAmount(finalTaxAmount);
+                                    result.setFinalTaxAmount(finalTaxAmount);*/
+
                                     if(MainActivity.c2XDevice != null) {
                                         MainActivity.c2XDevice.sendCardholderInteractionResult(result);
                                     } else {

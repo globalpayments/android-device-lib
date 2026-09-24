@@ -317,12 +317,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         @Override
         public void onError(Error error, ErrorType errorType) {
             Log.e(TAG, "onError - " + error.toString() + ", " + errorType);
-            if (Dialogs.pd != null && Dialogs.pd.isShowing()) {
-                Dialogs.hideProgress();
-            }
-            Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-            //update connection status
-            updateConnectionStatus("Error - " + error.getMessage(), true);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (Dialogs.pd != null && Dialogs.pd.isShowing()) {
+                        Dialogs.hideProgress();
+                    }
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    //update connection status
+                    updateConnectionStatus("Error - " + error.getMessage(), true);
+                }
+            });
+
         }
 
         @Override

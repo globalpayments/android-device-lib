@@ -7,7 +7,7 @@ This Android library lets you connect to a C2X, C3X, or Moby 5500 device and pro
 Maven
 -------------
 ```java
-implementation 'com.globalpayments:android-device-lib:2.1.5'
+implementation 'com.globalpayments:android-device-lib:2.1.6'
 ```
 
 Example App

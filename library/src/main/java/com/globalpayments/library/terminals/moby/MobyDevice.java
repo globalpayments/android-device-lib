@@ -149,9 +149,7 @@ public class MobyDevice implements IDevice {
         }
 
         LibraryConfigHelper.setSurchargeEnabled(connectionConfig.isSurchargeEnabled());
-
-        //Surcharge rate is handled by the application now
-        /*LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
+        LibraryConfigHelper.setSurchargePreTax(connectionConfig.isSurchargePreTax());
         if (LibraryConfigHelper.isSurchargeEnabled()) {
             //can ignore any custom value if surcharge isn't even enabled
             boolean surchargePercentUpdate =
@@ -159,7 +157,7 @@ public class MobyDevice implements IDevice {
             if (!surchargePercentUpdate) {
                 throw new Exception(applicationContext.getString(R.string.invalid_surcharge_amount));
             }
-        }*/
+        }
 
         transactionConfig = new TransactionConfiguration();
         transactionConfig.setQuickChipEnabled(true);
@@ -236,6 +234,13 @@ public class MobyDevice implements IDevice {
             );
         } catch (InitializationException ex) {
             ex.printStackTrace();
+            GPLibraryLogManager.emit(GPLibraryLogLevel.ERROR, GPLibraryLogType.DEVICE, TAG,
+                    "Initialization error", null);
+            if (deviceListener != null) {
+                java.lang.Error err = new java.lang.Error("Initialization Error");
+                ErrorType errorType = map(com.tsys.payments.library.enums.ErrorType.NOT_INITIALIZED);
+                deviceListener.onError(err, errorType);
+            }
         }
     }
 
@@ -641,6 +646,7 @@ public class MobyDevice implements IDevice {
         cr.setCardholderInteractionType(info.getCardholderInteractionType());
         cr.setCommercialCardDataFields(info.getCommercialCardDataFields());
         cr.setFinalTransactionAmount(info.getFinalTransactionAmount());
+        cr.setSurchargeAmount(info.getFinalSurchargeAmount());
         cr.setSupportedApplications(info.getSupportedApplications());
         return cr;
     }

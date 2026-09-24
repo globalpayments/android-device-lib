@@ -2,10 +2,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [2.1.5] - 2026-09-17
+## [2.1.6] - 2026-09-24
  
 ### Added
 
+### Changed
+- Brought back previous surcharge functionality while retaining the new functionality.
+### Fixed
+- Fixed issue whitespace at beginning or end of certain portico credentials causing a NumberFormatException and improved error handling for invalid non-number values (AH-3149).
+- Added missing item to 2.1.5 changelog for logging control (see below).
+
+
+## [2.1.5] - 2026-09-17
+ 
+### Added
+- Terminal logging control and coverage.
 ### Changed
 - Update surcharge functionality so the SDK no longer calculates the surcharge amount and the application is responsible for calculating the final amounts for total, tax, and surcharge (the example-app shows an example of this) (AH-2551). 
 ### Fixed

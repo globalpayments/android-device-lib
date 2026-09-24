@@ -67,6 +67,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private Button disconnect;
     private Switch safSwitch;
     private Switch surchargeSwitch;
+    private Switch surchargePretaxSwitch;
+    private EditText surchargeCustomPercent;
     private int startCounter = 0;
 
     public static boolean isShowAbout() {
@@ -142,6 +144,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         safSwitch.setOnClickListener(this);
         surchargeSwitch = findViewById(R.id.surcharge_switch);
         surchargeSwitch.setOnClickListener(this);
+        surchargePretaxSwitch = findViewById(R.id.surcharge_pretax_switch);
+        surchargePretaxSwitch.setOnClickListener(this);
+        surchargeCustomPercent = findViewById(R.id.surcharge_custom_edittext);
         about = findViewById(R.id.about_button);
         disconnect = findViewById(R.id.disconnect_button);
         disconnect.setOnClickListener(this);
@@ -351,6 +356,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             } else {
                 Toast.makeText(this, "Surcharge is disabled", Toast.LENGTH_LONG).show();
             }
+        } else if (view.getId() == R.id.surcharge_pretax_switch) {
+            if (surchargePretaxSwitch.isChecked()) {
+                Toast.makeText(this, "Surcharge Pre-Tax is enabled", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Surcharge Pre-Tax is disabled", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -373,9 +384,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         connectionConfig.setSafEnabled(safSwitch.isChecked());
         connectionConfig.setSafExpirationInDays(5);
         connectionConfig.setSurchargeEnabled(surchargeSwitch.isChecked());
+        connectionConfig.setSurchargePreTax(surchargePretaxSwitch.isChecked());
+        if (!surchargeCustomPercent.getText().toString().isEmpty()) {
+            connectionConfig.setSurchargePercent(getCustomSurchargePercent());
+        }
         connectionConfig.setEnvironment(environmentSwitch.isChecked() ? Environment.PRODUCTION : Environment.TEST);
         connectionConfig.setGateway(gatewaySwitch.isChecked() ? GatewayType.TRANSIT : GatewayType.PORTICO);
         return connectionConfig;
+    }
+
+    private float getCustomSurchargePercent() {
+        String customPercent = surchargeCustomPercent.getText().toString();
+        float floatValue;
+        try {
+            floatValue = Float.parseFloat(customPercent);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return floatValue;
     }
 
     /**
