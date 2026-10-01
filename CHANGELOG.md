@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.7] - 2026-10-01
+ 
+### Added
+
+### Changed
+- Updated the Ingenico SDK dependencies to version 2.6.5.7 (previously used 2.6.1.7).
+### Fixed
+- Fixed crash issue caused by NullPointerException when uploading SAF with low/no network (AH-3188).
+
+
 ## [2.1.6] - 2026-09-24
  
 ### Added
