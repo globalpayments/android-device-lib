@@ -2,6 +2,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.8] - 2026-10-08
+ 
+### Added
+
+### Changed
+- Updated SAF logic to no longer save to storage when transaction was cancelled (AH-3189).
+### Fixed
+- Fixed a null pointer exception for surcharge when no tax value was provided.
+- Fixed logic for follow-up transactions targeting transactions that failed due to non-generic decline (AH-3242).
+
+
 ## [2.1.7] - 2026-10-01
  
 ### Added
