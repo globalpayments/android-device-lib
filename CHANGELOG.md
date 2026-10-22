@@ -2,6 +2,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.1.9] - 2026-10-21
+ 
+### Added
+
+### Changed
+
+### Fixed
+- Fixed issue with how 504 Gateway Timeout errors were handled (AH-3102).
+- Fixed provision loading after firmware update for Moby 5500.
+
+
 ## [2.1.8] - 2026-10-08
  
 ### Added

@@ -16,7 +16,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 41
-        versionName "2.1.8"
+        versionName "2.1.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -70,7 +70,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.0-alpha06'
     implementation "androidx.work:work-runtime:2.7.1"
     // Global payments SDK
-    implementation 'com.globalpayments:globalpayments-sdk:15.2.0'
+    implementation 'com.globalpayments:globalpayments-sdk:15.4.0'
 
     /** Vital SDK dependencies - Start **/
     //switch out commented code to change between local and hosted vital libs
@@ -85,13 +85,13 @@ dependencies {
     api project(path: ':vital-sdk:temlibrary')*/
     api 'com.globalpayments:globalpayments-bbpos:1.0.10'
     api 'com.globalpayments:globalpayments-core:1.0.23'
-    implementation 'com.globalpayments:globalpayments-ingenico:1.1.0'
-    api 'com.globalpayments:globalpayments-portico:1.0.26'
+    implementation 'com.globalpayments:globalpayments-ingenico:1.1.1'
+    api 'com.globalpayments:globalpayments-portico:1.0.27'
     api 'com.globalpayments:globalpayments-transit:1.0.2'
     api 'com.globalpayments:globalpayments-roamreader:2.6.5.7'
     api 'com.globalpayments:globalpayments-temlibrary:2.6.5.7'
     api 'com.globalpayments:globalpayments-database-portico:1.0.6'
-    api 'com.globalpayments:globalpayments-transaction-manager:1.0.28'
+    api 'com.globalpayments:globalpayments-transaction-manager:1.0.29'
 
     // Apache Commons
     //implementation 'commons-codec:commons-codec:1.13'
