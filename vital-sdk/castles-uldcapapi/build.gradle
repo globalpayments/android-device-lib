@@ -1,0 +1,99 @@
+plugins {
+    id "com.vanniktech.maven.publish" version "0.28.0"
+    id "maven-publish"
+    id "signing"
+}
+import com.vanniktech.maven.publish.SonatypeHost
+
+configurations.maybeCreate("default")
+def publishArtifact = artifacts.add("default", file('CTOS.CtUldcapapi_V0.0.01.aar'))
+
+// Artifact parameters
+def sdkGroupId = 'com.globalpayments'
+def sdkArtifactId = 'globalpayments-gpone-cu'
+def sdkVersion = '0.0.01'
+
+afterEvaluate {
+    publishing {
+        publications {
+            aar(MavenPublication) {
+
+                artifact publishArtifact
+
+                groupId = sdkGroupId
+                artifactId = sdkArtifactId
+                version = sdkVersion
+
+                pom {
+                    name = sdkArtifactId
+                    description = 'Payment library for supporting the Global Payments Android Device Library.'
+                    url = 'https://developer.globalpay.com/'
+
+                    licenses {
+                        license {
+                            name = 'The MIT License (MIT)'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'globalpayments'
+                            name = 'Global Payments'
+                            email = 'developers@globalpayments.com'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:git:git://github.com/globalpayments/android-device-lib.git'
+                        developerConnection = 'scm:git:ssh://globalpayments/android-device-lib.git'
+                        url = 'https://github.com/globalpayments/android-device-lib'
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = "ossrh-staging-api"
+                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+            }
+        }
+    }
+
+    mavenPublishing {
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+        coordinates(sdkGroupId, sdkArtifactId, sdkVersion)
+        signAllPublications()
+
+        pom {
+            name = sdkArtifactId
+            description = 'Payment library for supporting the Global Payments Android Device Library.'
+            url = 'https://developer.globalpay.com/'
+            licenses {
+                license {
+                    name = 'The MIT License (MIT)'
+                    url = 'https://opensource.org/licenses/MIT'
+                }
+            }
+
+            developers {
+                developer {
+                    id = 'globalpayments'
+                    name = 'Global Payments'
+                    email = 'developers@globalpayments.com'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:git://github.com/globalpayments/android-device-lib.git'
+                developerConnection = 'scm:git:ssh://globalpayments/android-device-lib.git'
+                url = 'https://github.com/globalpayments/android-device-lib'
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications
+}

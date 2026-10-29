@@ -11,16 +11,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+
 import com.globalpayments.library.terminals.ConnectionConfig;
 import com.globalpayments.library.terminals.Credentials;
 import com.globalpayments.library.terminals.c2x.C2XDevice;
+import com.globalpayments.library.terminals.entities.TerminalInfo;
 import com.globalpayments.library.terminals.enums.ConnectionMode;
 import com.globalpayments.library.terminals.enums.Environment;
 import com.globalpayments.library.terminals.moby.MobyDevice;
+import com.globalpayments.library.terminals.puck1000.Puck1000Device;
 import com.globalpayments.library.utilities.PermissionHelper;
 import com.globalpayments.library.utilities.PermissionHelper.PermissionsCallBack;
 import com.tsys.payments.library.gateway.enums.GatewayType;
+
 import timber.log.Timber;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, PermissionsCallBack {
@@ -43,30 +48,40 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     public static C2XDevice c2XDevice;
     public static MobyDevice mobyDevice;
+    public static Puck1000Device puck1000Device;
     public static String firmwareVersion;
     public static String kernelVersion;
+    public static String terminalType;
+    public static String terminalSerialNumber;
+    public static String terminalAppName;
+    public static String terminalAppVersion;
+    public static String terminalModel;
+    public static String terminalManufacturer;
+    public static String terminalBatteryLevel;
     public static String transactionId;
     public static TransactionState transactionState = TransactionState.None;
     public static String cardReaderStatus;
     public static String transactionResult;
 
     public static String PUBLIC_KEY;
+    public static String MERCHANT_ID;
+    public static String DEVELOPER_ID;
+    public static String TRANSACTION_KEY;
     public static String USERNAME;
     public static String PASSWORD;
     public static String SITE_ID;
     public static String DEVICE_ID;
     public static String LICENSE_ID;
-    public static String MERCHANT_ID;
-    public static String DEVELOPER_ID;
-    public static String TRANSACTION_KEY;
 
     private static boolean isAboutClick = false;
     private Switch environmentSwitch;
     private Switch gatewaySwitch;
     private Button about;
     private Button disconnect;
+    private Button terminalInfo;
     private Switch safSwitch;
     private Switch surchargeSwitch;
+    private Switch provisionalTransactionSwitch;
     private Switch surchargePretaxSwitch;
     private EditText surchargeCustomPercent;
     private int startCounter = 0;
@@ -133,6 +148,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.connect_to_device_button).setOnClickListener(this);
         findViewById(R.id.connect_to_moby_button).setOnClickListener(this);
         findViewById(R.id.connect_to_mobyUSB_button).setOnClickListener(this);
+        // PUCK1000
+        findViewById(R.id.connect_to_puck1000Usb_button).setOnClickListener(this);
+        findViewById(R.id.puck1000_terminal_info_button).setOnClickListener(this);
         findViewById(R.id.manual_card_button).setOnClickListener(this);
         findViewById(R.id.transaction_button).setOnClickListener(this);
         findViewById(R.id.ota_update_button).setOnClickListener(this);
@@ -142,6 +160,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         gatewaySwitch.setOnClickListener(this);
         safSwitch = findViewById(R.id.saf_switch);
         safSwitch.setOnClickListener(this);
+        provisionalTransactionSwitch = findViewById(R.id.provisional_switch);
+        provisionalTransactionSwitch.setOnClickListener(this);
         surchargeSwitch = findViewById(R.id.surcharge_switch);
         surchargeSwitch.setOnClickListener(this);
         surchargePretaxSwitch = findViewById(R.id.surcharge_pretax_switch);
@@ -149,6 +169,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         surchargeCustomPercent = findViewById(R.id.surcharge_custom_edittext);
         about = findViewById(R.id.about_button);
         disconnect = findViewById(R.id.disconnect_button);
+        terminalInfo = findViewById(R.id.puck1000_terminal_info_button);
+        terminalInfo.setVisibility(View.INVISIBLE);
+        terminalInfo.setEnabled(false);
         disconnect.setOnClickListener(this);
         //check location permission
         boolean permissionGranted = checkLocationPermission();
@@ -175,6 +198,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (c2XDevice != null && c2XDevice.isConnected()) {
             showHideButtonDisplay(isVisible, DeviceType.C2X_C3X);
         }
+
+        if (puck1000Device != null && puck1000Device.isConnected()) {
+            showHideButtonDisplay(isVisible, DeviceType.PUCK1000);
+        }
     }
 
     @Override
@@ -188,6 +215,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         findViewById(R.id.connect_to_moby_button).setEnabled(!isVisible);
         findViewById(R.id.connect_to_mobyUSB_button).setEnabled(!isVisible);
         findViewById(R.id.connect_to_device_button).setEnabled(!isVisible);
+        findViewById(R.id.connect_to_puck1000Usb_button).setEnabled(!isVisible);
         disconnect.setEnabled(isVisible);
 
         switch (type) {
@@ -198,8 +226,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 } else {
                     about.setEnabled(false);
                 }
+                terminalInfo.setVisibility(View.INVISIBLE);
+                terminalInfo.setEnabled(false);
                 break;
+            case PUCK1000:
+                terminalInfo.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
+                terminalInfo.setEnabled(isVisible);
+                about.setEnabled(false);
+                break;
+            case C2X_C3X:
             default:
+                terminalInfo.setVisibility(View.INVISIBLE);
+                terminalInfo.setEnabled(false);
+                about.setEnabled(false);
                 break;
         }
     }
@@ -227,11 +266,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     }
 
     private boolean areCredentialsNull() {
-        if (USERNAME == null || PASSWORD == null || SITE_ID == null || DEVICE_ID == null ||
-                LICENSE_ID == null) {
-            return true;
-        }
-        return false;
+        boolean isCommonCredentialMissing = USERNAME == null || PASSWORD == null || DEVICE_ID == null;
+        // site id and license id are only required for portico credentials, so check if the gateway switch is off before checking those values
+        boolean isPorticoCredentialMissing = !gatewaySwitch.isChecked()
+                && (SITE_ID == null || LICENSE_ID == null);
+        return isCommonCredentialMissing || isPorticoCredentialMissing;
     }
 
     @Override
@@ -302,6 +341,36 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             Intent mobyUsbIntent = new Intent(this, BluetoothActivity.class);
             mobyUsbIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.USB);
             startActivity(mobyUsbIntent);
+        } else if (view.getId() == R.id.connect_to_puck1000Usb_button) {
+            // PUCK1000
+            if (areCredentialsNull()) {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_credentials_null));
+                return;
+            }
+            try{
+                if(puck1000Device == null) {
+                    puck1000Device = new Puck1000Device(getApplicationContext(), getConnectionConfig(ConnectionMode.USB));
+                }
+                else {
+                    puck1000Device.setConnectionConfig(getConnectionConfig(ConnectionMode.USB));
+                }
+                clearPuckTerminalDetails();
+            }
+            catch(Exception e) {
+                showAlertDialog(getString(R.string.configuration_error), e.getMessage());
+                return;
+            }
+            Intent puck1000UsbIntent = new Intent(this, BluetoothActivity.class);
+            puck1000UsbIntent.putExtra(BluetoothActivity.EXTRA_CONNECTION_MODE, ConnectionMode.USB);
+            puck1000UsbIntent.putExtra(BluetoothActivity.EXTRA_IS_PUCK1000, true);
+            startActivity(puck1000UsbIntent);
+        } else if (view.getId() == R.id.puck1000_terminal_info_button) {
+            if (puck1000Device != null && puck1000Device.isConnected()) {
+                Intent terminalInfoIntent = new Intent(this, TerminalInfoActivity.class);
+                startActivity(terminalInfoIntent);
+            } else {
+                showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
+            }
         } else if (view.getId() == R.id.manual_card_button) {
             Intent manualIntent = new Intent(this, CardEntryActivity.class);
             startActivity(manualIntent);
@@ -316,6 +385,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 Toast.makeText(this, "Prod is Selected", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "Test is Selected", Toast.LENGTH_LONG).show();
+            }
+            if (deviceIsConnected()) {
+                updateConnectionConfigEnvironmentSettings();
             }
         } else if (view.getId() == R.id.gateway_switch) {
             if (gatewaySwitch.isChecked()) {
@@ -341,6 +413,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 c2XDevice = null;
                 startCounter = 1;
                 showHideButtonDisplay(false, DeviceType.C2X_C3X);
+            } else if (puck1000Device != null && puck1000Device.isConnected()) {
+                puck1000Device.disconnect();
+                puck1000Device = null;
+                clearPuckTerminalDetails();
+                startCounter = 1;
+                showHideButtonDisplay(false, DeviceType.PUCK1000);
             } else {
                 showHideButtonDisplay(false, DeviceType.MOBY);
             }
@@ -356,6 +434,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             } else {
                 Toast.makeText(this, "Surcharge is disabled", Toast.LENGTH_LONG).show();
             }
+            if(deviceIsConnected()) {
+                updateConnectionConfigSurchargeSettings();
+            }
+        } else if (view.getId() == R.id.provisional_switch) {
+            if (provisionalTransactionSwitch.isChecked()) {
+                Timber.tag(TAG).d("onClick: Provisional Transaction switch is enabled");
+                Toast.makeText(this, "Provisional Transaction is enabled", Toast.LENGTH_LONG).show();
+            } else {
+                Timber.tag(TAG).d("onClick: Provisional Transaction switch is disabled");
+                Toast.makeText(this, "Provisional Transaction is disabled", Toast.LENGTH_LONG).show();
+            }
         } else if (view.getId() == R.id.surcharge_pretax_switch) {
             if (surchargePretaxSwitch.isChecked()) {
                 Toast.makeText(this, "Surcharge Pre-Tax is enabled", Toast.LENGTH_LONG).show();
@@ -363,6 +452,34 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 Toast.makeText(this, "Surcharge Pre-Tax is disabled", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void updateConnectionConfigSurchargeSettings() {
+        if (mobyDevice != null && mobyDevice.isConnected()) {
+            mobyDevice.setSurchargeEnabled(surchargeSwitch.isChecked());
+        } else if (c2XDevice != null && c2XDevice.isConnected()) {
+            c2XDevice.setSurchargeEnabled(surchargeSwitch.isChecked());
+        } else if (puck1000Device != null && puck1000Device.isConnected()) {
+            puck1000Device.setSurchargeEnabled(surchargeSwitch.isChecked());
+        }
+    }
+
+    private void updateConnectionConfigEnvironmentSettings() {
+        boolean isDebugMode = !environmentSwitch.isChecked();
+
+        if (mobyDevice != null && mobyDevice.isConnected()) {
+            mobyDevice.setDebugMode(isDebugMode);
+        } else if (c2XDevice != null && c2XDevice.isConnected()) {
+            c2XDevice.setDebugMode(isDebugMode);
+        } else if (puck1000Device != null && puck1000Device.isConnected()) {
+            puck1000Device.setDebugMode(isDebugMode);
+        }
+    }
+
+    private boolean deviceIsConnected() {
+        return (mobyDevice != null && mobyDevice.isConnected()) ||
+               (c2XDevice != null && c2XDevice.isConnected()) ||
+               (puck1000Device != null && puck1000Device.isConnected());
     }
 
     private ConnectionConfig getConnectionConfig(ConnectionMode connType) {
@@ -383,6 +500,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         connectionConfig.setConnectionMode(connType);
         connectionConfig.setSafEnabled(safSwitch.isChecked());
         connectionConfig.setSafExpirationInDays(5);
+        connectionConfig.setProvisionalTransactionEnabled(provisionalTransactionSwitch.isChecked());
         connectionConfig.setSurchargeEnabled(surchargeSwitch.isChecked());
         connectionConfig.setSurchargePreTax(surchargePretaxSwitch.isChecked());
         if (!surchargeCustomPercent.getText().toString().isEmpty()) {
@@ -463,6 +581,40 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     enum DeviceType {
         C2X_C3X,
-        MOBY
+        MOBY,
+        PUCK1000
+    }
+
+    public static void setPuckTerminalDetails(TerminalInfo terminalInfo) {
+        if (terminalInfo == null) {
+            clearPuckTerminalDetails();
+            return;
+        }
+
+        terminalType = asDisplayString(terminalInfo.getTerminalType());
+        terminalSerialNumber = terminalInfo.getSerialNumber();
+        terminalAppName = terminalInfo.getAppName();
+        terminalAppVersion = terminalInfo.getAppVersion();
+        firmwareVersion = terminalInfo.getFirmwareVersion();
+        terminalModel = terminalInfo.getModel();
+        terminalManufacturer = terminalInfo.getManufacturer();
+        kernelVersion = terminalInfo.getKernelVersion();
+        terminalBatteryLevel = asDisplayString(terminalInfo.getBatteryLevel());
+    }
+
+    private static String asDisplayString(Object value) {
+        return value == null ? null : value.toString();
+    }
+
+    public static void clearPuckTerminalDetails() {
+        terminalType = null;
+        terminalSerialNumber = null;
+        terminalAppName = null;
+        terminalAppVersion = null;
+        firmwareVersion = null;
+        terminalModel = null;
+        terminalManufacturer = null;
+        kernelVersion = null;
+        terminalBatteryLevel = null;
     }
 }

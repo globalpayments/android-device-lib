@@ -1,3 +1,5 @@
 include ':example-app', ':library', ':vital-sdk:bbpos', ':vital-sdk:core', ':vital-sdk:ingenico', ':vital-sdk:transit',
         ':vital-sdk:portico', ':vital-sdk:roamreader', ':vital-sdk:transaction-manager', ':vital-sdk:database-portico',
-        ':vital-sdk:temlibrary'
+        ':vital-sdk:temlibrary',
+        ':vital-sdk:castles-credit', ':vital-sdk:castles-payment', 'vital-sdk:castles-uldcapapi',
+        ':vital-sdk:castles-remotekeyinjection', ':vital-sdk:castles-scrp'

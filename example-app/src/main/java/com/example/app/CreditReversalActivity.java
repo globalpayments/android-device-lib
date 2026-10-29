@@ -10,6 +10,7 @@ import android.widget.Spinner;
 import com.globalpayments.library.entities.ReversalReason;
 import com.globalpayments.library.terminals.IDevice;
 import com.globalpayments.library.terminals.transactions.CreditReversalBuilder;
+import java.math.BigDecimal;
 
 public class CreditReversalActivity extends BaseTransactionActivity {
 
@@ -26,6 +27,8 @@ public class CreditReversalActivity extends BaseTransactionActivity {
             MainActivity.c2XDevice.setTransactionListener(transactionListener);
         } else if (MainActivity.mobyDevice != null) {
             MainActivity.mobyDevice.setTransactionListener(transactionListener);
+        }else if (MainActivity.puck1000Device != null) {
+            MainActivity.puck1000Device.setTransactionListener(transactionListener);
         }
 
         Spinner reversalReasonSpinner = findViewById(R.id.creditreversal_reversalreason);
@@ -41,12 +44,29 @@ public class CreditReversalActivity extends BaseTransactionActivity {
                 } else if(MainActivity.mobyDevice != null && !MainActivity.mobyDevice.isConnected()){
                     showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
                     return;
+                }else if(MainActivity.puck1000Device != null && !MainActivity.puck1000Device.isConnected()){
+                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
+                    return;
                 }
 
                 String transactionId = ((EditText) findViewById(R.id.transaction_id)).getText().toString();
+                String amount = ((EditText) findViewById(R.id.amount)).getText().toString();
 
                 if (transactionId.isEmpty()) {
                     showAlertDialog(getString(R.string.error), getString(R.string.error_no_transaction_id));
+                    return;
+                }
+
+                if (amount.isEmpty()) {
+                    showAlertDialog(getString(R.string.error), getString(R.string.error_no_amount));
+                    return;
+                }
+
+                BigDecimal totalAmount;
+                try {
+                    totalAmount = new BigDecimal(amount);
+                } catch (NumberFormatException e) {
+                    showAlertDialog(getString(R.string.error), getString(R.string.error_no_amount));
                     return;
                 }
 
@@ -54,9 +74,10 @@ public class CreditReversalActivity extends BaseTransactionActivity {
                 boolean allowDuplicates = ((CheckBox) findViewById(R.id.creditreversal_allowduplicates)).isChecked();
                 ReversalReason reversalReason = ReversalReason.values()[((Spinner) findViewById(R.id.creditreversal_reversalreason)).getSelectedItemPosition()];
 
-                IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+                IDevice device = getDevice();
                 CreditReversalBuilder creditReversalBuilder = new CreditReversalBuilder(device);
                 creditReversalBuilder.setTransactionId(transactionId);
+                creditReversalBuilder.setAmount(totalAmount);
                 if (clientTransactionId != null) {
                     creditReversalBuilder.setReferenceNumber(clientTransactionId);
                 }

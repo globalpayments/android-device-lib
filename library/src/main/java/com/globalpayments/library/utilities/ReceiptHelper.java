@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
+import com.globalpayments.library.BuildConfig;
 import com.globalpayments.library.terminals.entities.TerminalResponse;
 import com.globalpayments.library.terminals.enums.EntryMode;
 import java.text.SimpleDateFormat;
@@ -13,15 +14,21 @@ import java.util.Date;
 
 public class ReceiptHelper {
 
-    private static float sFontSize = 20f;
-    private static float sFontSizeLarge = 26f;
-    private static float sMargin = 30f;
+    private static final float FONT_SIZE = 20f;
+    private static final float FONT_SIZE_LARGE = 26f;
+    private static final float TEXT_MARGIN = 30f;
+    private static final String SDK_NAME = "android-device-lib";
 
     private static int sInvoiceNumber = 0;
 
     public static Bitmap createReceiptImage(TerminalResponse transaction) {
+        return createReceiptImage(transaction, true);
+    }
+
+    public static Bitmap createReceiptImage(TerminalResponse transaction, boolean isMerchantReceipt) {
         int width = 550;
-        int height = 790;
+        int height = 850;
+        float halfWidth = width / 2.f;
         sInvoiceNumber++;
         Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -33,16 +40,16 @@ public class ReceiptHelper {
 
         paint.setColor(Color.BLACK);
         paint.setAntiAlias(true);
-        paint.setTextSize(sFontSize);
+        paint.setTextSize(FONT_SIZE);
         paint.setTextAlign(Paint.Align.CENTER);
 
         //draw the header
-        paint.setTextSize(sFontSizeLarge);
-        canvas.drawText("HPS Test", (width / 2.f) , sMargin, paint);
-        paint.setTextSize(sFontSize);
-        canvas.drawText("1 Heartland Way", (width / 2.f) , sMargin + sFontSize, paint);
-        canvas.drawText("Jeffersonville, IN 47136", (width / 2.f) , sMargin + sFontSize*2, paint);
-        canvas.drawText("888-798-3133", (width / 2.f) , sMargin + sFontSize*3, paint);
+        paint.setTextSize(FONT_SIZE_LARGE);
+        canvas.drawText("HPS Test", halfWidth, TEXT_MARGIN, paint);
+        paint.setTextSize(FONT_SIZE);
+        canvas.drawText("1 Heartland Way", halfWidth, TEXT_MARGIN + FONT_SIZE, paint);
+        canvas.drawText("Jeffersonville, IN 47136", halfWidth, TEXT_MARGIN + FONT_SIZE * 2, paint);
+        canvas.drawText("888-798-3133", halfWidth, TEXT_MARGIN + FONT_SIZE * 3, paint);
 
         //draw date and time
         paint.setTextAlign(Align.LEFT);
@@ -53,131 +60,148 @@ public class ReceiptHelper {
         } else {
             date = format.format(new Date());
         }
-        canvas.drawText(date, sMargin, sMargin + sFontSize*5, paint);
+        canvas.drawText(date, TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 5, paint);
         paint.setTextAlign(Align.RIGHT);
         format = new SimpleDateFormat("hh:mm aa");
         String time = format.format(new Date());
-        canvas.drawText(time, width - sMargin, sMargin + sFontSize*5, paint);
+        canvas.drawText(time, width - TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 5, paint);
 
         //draw transaction type
-        paint.setTextSize(sFontSizeLarge);
+        paint.setTextSize(FONT_SIZE_LARGE);
         paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("CREDIT CARD", (width / 2.f) , sMargin + sFontSize*6, paint);
-        canvas.drawText(transaction.getTransactionType(), (width / 2.f) , sMargin + sFontSize*7, paint);
+        canvas.drawText("CREDIT CARD", halfWidth, TEXT_MARGIN + FONT_SIZE * 6, paint);
+        drawTextSafe(canvas, transaction.getTransactionType(), halfWidth, TEXT_MARGIN + FONT_SIZE * 7, paint);
 
         //draw detail list
-        paint.setTextSize(sFontSize);
+        paint.setTextSize(FONT_SIZE);
         paint.setTextAlign(Paint.Align.LEFT);
 
         if (transaction.getEntryMode() != EntryMode.SWIPE && transaction.getEntryMode() != EntryMode.CHIP_FALLBACK_SWIPE
                 && transaction.getEntryMode() != EntryMode.NONE) {
-            canvas.drawText(transaction.getCardType(), sMargin, sMargin + sFontSize * 9, paint);
-            canvas.drawText("ACCT:", sMargin, sMargin + sFontSize * 10, paint);
-            canvas.drawText("APP NAME:", sMargin, sMargin + sFontSize * 11, paint);
-            canvas.drawText("AID:", sMargin, sMargin + sFontSize * 12, paint);
-            canvas.drawText("ARQC:", sMargin, sMargin + sFontSize * 13, paint);
-            canvas.drawText("ENTRY MODE:", sMargin, sMargin + sFontSize * 14, paint);
-            canvas.drawText("ENTRY LEGEND:", sMargin, sMargin + sFontSize * 15, paint);
-            canvas.drawText("APPROVAL:", sMargin, sMargin + sFontSize * 16, paint);
-            canvas.drawText("TXN ID:", sMargin, sMargin + sFontSize * 17, paint);
-            canvas.drawText("INVOICE #:", sMargin, sMargin + sFontSize * 18, paint);
+            canvas.drawText(transaction.getCardType(), TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 9, paint);
+            canvas.drawText("ACCT:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 10, paint);
+            canvas.drawText("APP NAME:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 11, paint);
+            canvas.drawText("AID:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 12, paint);
+            canvas.drawText("ARQC:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 13, paint);
+            canvas.drawText("ENTRY MODE:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 14, paint);
+            canvas.drawText("ENTRY LEGEND:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 15, paint);
+            canvas.drawText("APPROVAL:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 16, paint);
+            canvas.drawText("TXN ID:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 17, paint);
+            canvas.drawText("INVOICE #:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 18, paint);
+            canvas.drawText("TVR:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 19, paint);
 
             String maskedCardNumber = transaction.getMaskedCardNumber();
             maskedCardNumber = "xxxx" + maskedCardNumber.substring(4);
-            canvas.drawText(maskedCardNumber, 200, sMargin + sFontSize * 10, paint);
-            canvas.drawText(transaction.getApplicationName(), 200, sMargin + sFontSize * 11, paint);
-            canvas.drawText(transaction.getApplicationId(), 200, sMargin + sFontSize * 12, paint);
-            canvas.drawText(transaction.getApplicationCryptogram(), 200, sMargin + sFontSize * 13, paint);
-            canvas.drawText(getEntryMode(transaction.getEntryMode()), 200, sMargin + sFontSize * 14, paint);
-            canvas.drawText("CHIP READ", 200, sMargin + sFontSize * 15, paint);
-            canvas.drawText(transaction.getApprovalCode(), 200, sMargin + sFontSize * 16, paint);
-            canvas.drawText(transaction.getTransactionId(), 200, sMargin + sFontSize * 17, paint);
-            canvas.drawText(getFormattedInvoiceNumber(), 200, sMargin + sFontSize * 18, paint);
+            canvas.drawText(maskedCardNumber, 200, TEXT_MARGIN + FONT_SIZE * 10, paint);
+            drawTextSafe(canvas, transaction.getApplicationName(), 200, TEXT_MARGIN + FONT_SIZE * 11, paint);
+            drawTextSafe(canvas, transaction.getApplicationId(), 200, TEXT_MARGIN + FONT_SIZE * 12, paint);
+            drawTextSafe(canvas, transaction.getApplicationCryptogram(), 200, TEXT_MARGIN + FONT_SIZE * 13, paint);
+            drawTextSafe(canvas, getEntryMode(transaction.getEntryMode()), 200, TEXT_MARGIN + FONT_SIZE * 14, paint);
+            canvas.drawText("CHIP READ", 200, TEXT_MARGIN + FONT_SIZE * 15, paint);
+            drawTextSafe(canvas, transaction.getApprovalCode(), 200, TEXT_MARGIN + FONT_SIZE * 16, paint);
+            drawTextSafe(canvas, transaction.getTransactionId(), 200, TEXT_MARGIN + FONT_SIZE * 17, paint);
+            drawTextSafe(canvas, getFormattedInvoiceNumber(), 200, TEXT_MARGIN + FONT_SIZE * 18, paint);
+            drawTextSafe(canvas, transaction.getTerminalVerificationResult(), 200, TEXT_MARGIN + FONT_SIZE * 19, paint);
+
         } else if (transaction.getEntryMode() == EntryMode.SWIPE || transaction.getEntryMode() == EntryMode.CHIP_FALLBACK_SWIPE) {
-            canvas.drawText(transaction.getCardType(), sMargin, sMargin + sFontSize * 9, paint);
-            canvas.drawText("ACCT:", sMargin, sMargin + sFontSize * 10, paint);
-            canvas.drawText("APP NAME:", sMargin, sMargin + sFontSize * 11, paint);
-            canvas.drawText("ENTRY MODE:", sMargin, sMargin + sFontSize * 12, paint);
-            canvas.drawText("ENTRY LEGEND:", sMargin, sMargin + sFontSize * 13, paint);
-            canvas.drawText("APPROVAL:", sMargin, sMargin + sFontSize * 14, paint);
-            canvas.drawText("TXN ID:", sMargin, sMargin + sFontSize * 15, paint);
-            canvas.drawText("INVOICE #:", sMargin, sMargin + sFontSize * 16, paint);
+            drawTextSafe(canvas, transaction.getCardType(), TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 9, paint);
+            canvas.drawText("ACCT:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 10, paint);
+            canvas.drawText("APP NAME:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 11, paint);
+            canvas.drawText("ENTRY MODE:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 12, paint);
+            canvas.drawText("ENTRY LEGEND:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 13, paint);
+            canvas.drawText("APPROVAL:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 14, paint);
+            canvas.drawText("TXN ID:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 15, paint);
+            canvas.drawText("INVOICE #:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 16, paint);
+            canvas.drawText("TVR:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 17, paint);
 
-            if (transaction.getMaskedCardNumber() != null) {
-                canvas.drawText(transaction.getMaskedCardNumber(), 200, sMargin + sFontSize * 10, paint);
-            }
-            canvas.drawText("US CREDIT", 200, sMargin + sFontSize * 11, paint);
-            canvas.drawText(getEntryMode(transaction.getEntryMode()), 200, sMargin + sFontSize * 12, paint);
-            canvas.drawText("MAG STRIPE", 200, sMargin + sFontSize * 13, paint);
-            canvas.drawText(transaction.getApprovalCode(), 200, sMargin + sFontSize * 14, paint);
-            canvas.drawText(transaction.getTransactionId(), 200, sMargin + sFontSize * 15, paint);
-            canvas.drawText(getFormattedInvoiceNumber(), 200, sMargin + sFontSize * 16, paint);
+            drawTextSafe(canvas, transaction.getMaskedCardNumber(), 200, TEXT_MARGIN + FONT_SIZE * 10, paint);
+            canvas.drawText("US CREDIT", 200, TEXT_MARGIN + FONT_SIZE * 11, paint);
+            drawTextSafe(canvas, getEntryMode(transaction.getEntryMode()), 200, TEXT_MARGIN + FONT_SIZE * 12, paint);
+            canvas.drawText("MAG STRIPE", 200, TEXT_MARGIN + FONT_SIZE * 13, paint);
+            drawTextSafe(canvas, transaction.getApprovalCode(), 200, TEXT_MARGIN + FONT_SIZE * 14, paint);
+            drawTextSafe(canvas, transaction.getTransactionId(), 200, TEXT_MARGIN + FONT_SIZE * 15, paint);
+            drawTextSafe(canvas, getFormattedInvoiceNumber(), 200, TEXT_MARGIN + FONT_SIZE * 16, paint);
+            drawTextSafe(canvas, transaction.getTerminalVerificationResult(), 200, TEXT_MARGIN + FONT_SIZE * 17, paint);
+
         } else {
-            canvas.drawText("APPROVAL:", sMargin, sMargin + sFontSize * 9, paint);
-
-            canvas.drawText(transaction.getApprovalCode(), 200, sMargin + sFontSize * 9, paint);
+            canvas.drawText("APPROVAL:", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 9, paint);
+            drawTextSafe(canvas, transaction.getApprovalCode(), 200, TEXT_MARGIN + FONT_SIZE * 9, paint);
         }
 
         //draw description
-        canvas.drawText("DESCRIPTION: Merchandise", sMargin, sMargin + sFontSize * 19, paint);
+        canvas.drawText("DESCRIPTION: Merchandise", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 20, paint);
 
         //draw total
-        paint.setTextSize(sFontSizeLarge);
-        canvas.drawText("TOTAL", sMargin, sMargin + sFontSize*21, paint);
+        paint.setTextSize(FONT_SIZE_LARGE);
+        canvas.drawText("TOTAL", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 22, paint);
         paint.setTextAlign(Align.RIGHT);
-        canvas.drawText("USD $ " + transaction.getApprovedAmount(), width - sMargin, sMargin + sFontSize*21, paint);
+        canvas.drawText("USD $ " + transaction.getApprovedAmount(), width - TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 22, paint);
 
         if (transaction.getEntryMode() != EntryMode.NONE) {
             if ((transaction.getEntryMode() == EntryMode.SWIPE || transaction.getEntryMode() == EntryMode.CHIP_FALLBACK_SWIPE)
-                || (transaction.getCardType().equalsIgnoreCase("DISCOVER") &&
+                    || (transaction.getCardType().equalsIgnoreCase("DISCOVER") &&
                     (transaction.getCardHolderVerificationMethod() == null || !transaction.getCardHolderVerificationMethod().equals("PIN_VERIFIED")))) {
                 //draw agreement
-                paint.setTextSize(sFontSize);
+                paint.setTextSize(FONT_SIZE);
                 paint.setTextAlign(Paint.Align.LEFT);
-                canvas.drawText("I agree to pay above total amount according to card", sMargin,
-                        sMargin + sFontSize * 24, paint);
-                canvas.drawText("issuer agreement.", sMargin, sMargin + sFontSize * 25, paint);
+                canvas.drawText("I agree to pay above total amount according to card", TEXT_MARGIN,
+                        TEXT_MARGIN + FONT_SIZE * 24, paint);
+                canvas.drawText("issuer agreement.", TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 25, paint);
 
                 //draw signature area
-
-                paint.setFlags(Paint.UNDERLINE_TEXT_FLAG);
-                canvas.drawText(
-                        "X                                                                                              ",
-                        sMargin, sMargin + sFontSize * 28, paint);
-                paint.setFlags(paint.getFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
-                paint.setTextAlign(Paint.Align.CENTER);
-                canvas.drawText("SIGNATURE", width / 2,
-                        sMargin + sFontSize * 29, paint);
+                if (transaction.getSignatureStatus() == null
+                        || (transaction.getSignatureStatus() != null
+                        && transaction.getSignatureStatus().equalsIgnoreCase("true"))) {
+                    paint.setFlags(Paint.UNDERLINE_TEXT_FLAG);
+                    canvas.drawText(
+                            "X                                                                                              ",
+                            TEXT_MARGIN, TEXT_MARGIN + FONT_SIZE * 28, paint);
+                    paint.setFlags(paint.getFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
+                    paint.setTextAlign(Paint.Align.CENTER);
+                    canvas.drawText("SIGNATURE", halfWidth, TEXT_MARGIN + FONT_SIZE * 29, paint);
+                }
             }
 
-            paint.setTextSize(sFontSize);
+            paint.setTextSize(FONT_SIZE);
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("No Refunds", width / 2,
-                    sMargin + sFontSize * 31, paint);
-            canvas.drawText("Store Credit Only", width / 2,
-                    sMargin + sFontSize * 32, paint);
-            canvas.drawText("Merchant Copy", width / 2,
-                    sMargin + sFontSize * 34, paint);
+            canvas.drawText("No Refunds", halfWidth, TEXT_MARGIN + FONT_SIZE * 31, paint);
+            canvas.drawText("Store Credit Only", halfWidth, TEXT_MARGIN + FONT_SIZE * 32, paint);
+            canvas.drawText(isMerchantReceipt ? "Merchant Copy" : "Customer Copy", halfWidth,
+                    TEXT_MARGIN + FONT_SIZE * 34, paint);
         }
 
         //draw status
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(sFontSizeLarge);
-        canvas.drawText(transaction.getDeviceResponseCode(), width / 2, sMargin + sFontSize*36, paint);
+        paint.setTextSize(FONT_SIZE_LARGE);
+        drawTextSafe(canvas, transaction.getDeviceResponseCode(), halfWidth,
+                TEXT_MARGIN + FONT_SIZE * 36, paint);
+        paint.setTextSize(FONT_SIZE);
+        canvas.drawText(SDK_NAME, halfWidth, TEXT_MARGIN + FONT_SIZE * 38, paint);
+        canvas.drawText("Version " + BuildConfig.VERSION_NAME, halfWidth,
+                TEXT_MARGIN + FONT_SIZE * 39, paint);
 
         return bitmap;
     }
 
     private static String getEntryMode(EntryMode entryMode) {
-        if (entryMode == EntryMode.CHIP) {
-            return "CONTACT";
-        } else {
-            return entryMode.toString();
-        }
+        return entryMode == EntryMode.CHIP ? "CONTACT" : entryMode.toString();
     }
 
     private static String getFormattedInvoiceNumber() {
-        String formattedValue = String.format("%04d", sInvoiceNumber);
-        return formattedValue;
+        return String.format("%04d", sInvoiceNumber);
+    }
+
+    /**
+     * Draws text on the canvas only if the text is not null.
+     *
+     * @param canvas The canvas on which to draw the text.
+     * @param text   The text to draw.
+     * @param x      The x-coordinate of the text's starting point.
+     * @param y      The y-coordinate of the text's baseline.
+     * @param paint  The paint used to draw the text.
+     */
+    private static void drawTextSafe(Canvas canvas, String text, float x, float y, Paint paint) {
+        if (text != null)
+            canvas.drawText(text, x, y, paint);
     }
 }

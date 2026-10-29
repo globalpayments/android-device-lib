@@ -26,6 +26,16 @@ public class CreditSaleBuilder extends BaseBuilder {
     private String cardBrandTxnId;
     private BigDecimal taxAmount;
 
+    public BigDecimal getSurchargeAmount() {
+        return surchargeAmount;
+    }
+
+    public void setSurchargeAmount(BigDecimal surchargeAmount) {
+        this.surchargeAmount = surchargeAmount;
+    }
+
+    private BigDecimal surchargeAmount = null;
+
    /* public CreditSaleBuilder(C2XDevice device) {
         super((IDevice) device);
     }*/
@@ -81,6 +91,7 @@ public class CreditSaleBuilder extends BaseBuilder {
         if (taxAmount != null) {
             request.setTax(taxAmount.movePointRight(2).longValue());
         }
+        request.setSurcharge(surchargeAmount != null ? surchargeAmount.movePointRight(2).longValue() : 0);
 
         if (creditCard != null) {
             CardData card = new CardData();

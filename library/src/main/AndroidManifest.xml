@@ -11,9 +11,19 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.USB_PERMISSION" />
+    <uses-feature android:name="android.hardware.usb.host" />
 
     <application>
-        <activity android:name="com.globalpayments.library.CardActivity"
-            android:theme="@style/Theme.AppCompat.Light"></activity>
+        <activity
+            android:name="com.globalpayments.library.CardActivity"
+            android:theme="@style/Theme.AppCompat.Light">
+        </activity>
+
+        <provider
+            android:name="com.castles.credit.context.ContactLibraryInitProvider"
+            android:authorities="${applicationId}.contactLibraryInitProvider"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 </manifest>

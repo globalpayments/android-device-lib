@@ -33,6 +33,13 @@ public class ConnectionConfig {
     // moby-specific
     private boolean mobyAutoRebootDisabled = false;
 
+    // provisional transactions
+    private boolean provisionalTransactionEnabled;
+
+    // PUCK1000 Mutual Authentication
+    private boolean puckMutualAuthEnabled;
+    private String puckMutualAuthCertUrl;
+
     private Environment environment;
     private GatewayType gateway;
 
@@ -181,5 +188,45 @@ public class ConnectionConfig {
 
     public void setMobyAutoRebootDisabled(boolean mobyAutoRebootDisabled) {
         this.mobyAutoRebootDisabled = mobyAutoRebootDisabled;
+    }
+
+    public boolean isProvisionalTransactionEnabled() {
+        return provisionalTransactionEnabled;
+    }
+
+    public void setProvisionalTransactionEnabled(boolean provisionalTransactionEnabled) {
+        this.provisionalTransactionEnabled = provisionalTransactionEnabled;
+    }
+
+    /**
+     * @return whether Mutual Authentication should be performed when connecting to a PUCK1000
+     * reader. Only supported on readers running firmware that supports Mutual Authentication.
+     */
+    public boolean isPuckMutualAuthEnabled() {
+        return puckMutualAuthEnabled;
+    }
+
+    /**
+     * Enables or disables PUCK1000 Mutual Authentication. When enabled, the SDK downloads the
+     * COTS/PUCK certificates and performs the Mutual Authentication handshake during connection.
+     */
+    public void setPuckMutualAuthEnabled(boolean puckMutualAuthEnabled) {
+        this.puckMutualAuthEnabled = puckMutualAuthEnabled;
+    }
+
+    /**
+     * @return the override URL for the Mutual Authentication certificate server, or {@code null}
+     * to use the SDK default (sandbox) host.
+     */
+    public String getPuckMutualAuthCertUrl() {
+        return puckMutualAuthCertUrl;
+    }
+
+    /**
+     * Overrides the Mutual Authentication certificate server host. When {@code null} or empty the
+     * SDK default (sandbox) host is used.
+     */
+    public void setPuckMutualAuthCertUrl(String puckMutualAuthCertUrl) {
+        this.puckMutualAuthCertUrl = puckMutualAuthCertUrl;
     }
 }

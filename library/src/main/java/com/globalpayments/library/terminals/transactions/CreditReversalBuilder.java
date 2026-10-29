@@ -1,5 +1,7 @@
 package com.globalpayments.library.terminals.transactions;
 
+import java.math.BigDecimal;
+
 import com.tsys.payments.library.domain.TransactionRequest;
 import com.tsys.payments.library.enums.ReversalReason;
 import com.tsys.payments.library.enums.TransactionType;
@@ -10,6 +12,7 @@ public class CreditReversalBuilder extends BaseBuilder {
     private String referenceNumber;
     private String transactionId;
     private ReversalReason reversalReason;
+    private BigDecimal amount;
 
     /**
      * Build Reversal Transaction
@@ -24,6 +27,9 @@ public class CreditReversalBuilder extends BaseBuilder {
         TransactionRequest request = super.buildRequest();
 
         request.setTransactionType(TransactionType.REVERSAL);
+        if (amount != null) {
+            request.setTotal(amount.movePointRight(2).longValue());
+        }
         request.setGatewayTransactionId(transactionId);
         request.setPosReferenceNumber(referenceNumber);
         request.setReversalReason(reversalReason);
@@ -53,5 +59,13 @@ public class CreditReversalBuilder extends BaseBuilder {
 
     public void setReversalReason(com.globalpayments.library.entities.ReversalReason reversalReason) {
         this.reversalReason = ReversalReason.values()[reversalReason.ordinal()];
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }

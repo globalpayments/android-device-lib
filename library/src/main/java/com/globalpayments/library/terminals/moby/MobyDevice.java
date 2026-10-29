@@ -1,6 +1,7 @@
 package com.globalpayments.library.terminals.moby;
 
 import android.Manifest.permission;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -711,6 +712,16 @@ public class MobyDevice implements IDevice {
         dialog.show();
     }
 
+    public void setSurchargeEnabled(boolean checked) {
+        connectionConfig.setSurchargeEnabled(checked);
+        LibraryConfigHelper.setSurchargeEnabled(checked);
+    }
+
+    public void setDebugMode(boolean isDebugMode) {
+        connectionConfig.setEnvironment(isDebugMode ? Environment.TEST : Environment.PRODUCTION);
+        LibraryConfigHelper.setDebugMode(isDebugMode);
+    }
+
     /**
      * Bluetooth listener implementation.
      */
@@ -731,22 +742,12 @@ public class MobyDevice implements IDevice {
         }
 
         @Override
+        @SuppressLint("MissingPermission")
         public void onBluetoothDeviceFound(BluetoothDevice foundDevice) {
             if (foundDevice == null) {
                 return;
             }
 
-            if (ActivityCompat.checkSelfPermission(applicationContext, permission.BLUETOOTH_CONNECT) !=
-                    PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
             if (foundDevice.getType() != BluetoothDevice.DEVICE_TYPE_CLASSIC &&
                     foundDevice.getType() != BluetoothDevice.DEVICE_TYPE_LE &&
                     foundDevice.getType() != BluetoothDevice.DEVICE_TYPE_DUAL) {

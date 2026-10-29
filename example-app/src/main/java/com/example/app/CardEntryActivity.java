@@ -246,6 +246,8 @@ public class CardEntryActivity extends BaseActivity implements CardFragmentInter
                         MainActivity.c2XDevice.sendCardholderInteractionResult(result);
                     } else if (MainActivity.mobyDevice != null) {
                         MainActivity.mobyDevice.sendCardholderInteractionResult(result);
+                    } else if (MainActivity.puck1000Device != null) {
+                        MainActivity.puck1000Device.sendCardholderInteractionResult(result);
                     }
                     return true;
                 case FINAL_AMOUNT_CONFIRMATION:
@@ -258,6 +260,8 @@ public class CardEntryActivity extends BaseActivity implements CardFragmentInter
                         MainActivity.c2XDevice.sendCardholderInteractionResult(result);
                     } else if (MainActivity.mobyDevice != null) {
                         MainActivity.mobyDevice.sendCardholderInteractionResult(result);
+                    } else if (MainActivity.puck1000Device != null) {
+                        MainActivity.puck1000Device.sendCardholderInteractionResult(result);
                     }
                     return true;
                 default:

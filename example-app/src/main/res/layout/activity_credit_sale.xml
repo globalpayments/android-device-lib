@@ -40,15 +40,26 @@
         android:layout_below="@id/status_layout"
         android:layout_marginTop="@dimen/layout_margin"/>
 
-    <!-- Options go here -->
-    <LinearLayout
-        android:id="@+id/param_layout"
+    <ScrollView
+        android:id="@+id/form_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_height="match_parent"
         android:layout_below="@id/creditsale_title"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="@dimen/layout_margin">
+        android:layout_alignParentBottom="true"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Options go here -->
+            <LinearLayout
+                android:id="@+id/param_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="@dimen/layout_margin">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -192,13 +203,17 @@
                 android:hint="@string/optional_token"/>
 
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal">
 
         <CheckBox
             android:id="@+id/creditsale_allowduplicates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/allow_duplicates"
-            android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/layout_margin_small"/>
 
         <CheckBox
@@ -206,19 +221,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/request_token"
-            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/layout_margin_small"/>
+        <CheckBox
+            android:id="@+id/creditsale_withtoken"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/with_token"
             android:layout_marginTop="@dimen/layout_margin_small"/>
 
-    </LinearLayout>
+        <CheckBox
+            android:id="@+id/creditsale_withtip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/with_tip"
+            android:layout_marginTop="@dimen/layout_margin_small"/>
+        </LinearLayout>
 
-    <Button
-        android:id="@+id/execute_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/param_layout"
-        android:layout_marginTop="@dimen/layout_margin"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/execute" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/execute_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/layout_margin"
+                android:layout_marginBottom="@dimen/layout_margin"
+                android:text="@string/execute" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

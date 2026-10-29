@@ -1,5 +1,7 @@
 package com.example.app;
 
+import android.annotation.SuppressLint;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
@@ -33,6 +35,8 @@ import java.util.HashSet;
 import java.util.List;
 import static com.example.app.Dialogs.hideProgress;
 
+import timber.log.Timber;
+
 public abstract class BaseActivity extends AppCompatActivity {
 
     private static final String TAG = "BaseActivity";
@@ -46,6 +50,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static boolean connectButtonEnabled;
 
     protected Button executeButton;
+    private TerminalResponse pendingReceiptTransaction;
+    private boolean reopenReceiptTypeDialogOnResume;
+    private boolean isInReceiptEmailFlow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +68,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        if (isInReceiptEmailFlow && reopenReceiptTypeDialogOnResume && pendingReceiptTransaction != null) {
+            reopenReceiptTypeDialogOnResume = false;
+            isInReceiptEmailFlow = false;
+            showReceiptTypeDialog(pendingReceiptTransaction);
+        }
+
         if(MainActivity.mobyDevice != null) {
             MainActivity.mobyDevice.setMobyPairingContext(this);
             MainActivity.mobyDevice.setDeviceListener(mobyDeviceListener);
@@ -70,6 +83,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         if(MainActivity.c2XDevice != null) {
             MainActivity.c2XDevice.setDeviceListener(c2xDeviceListener);
             MainActivity.c2XDevice.setSafListener(safListener);
+        }
+
+        if(MainActivity.puck1000Device != null) {
+            MainActivity.puck1000Device.setDeviceListener(usbDeviceListener);
+            MainActivity.puck1000Device.setSafListener(safListener);
         }
 
         if (!(this instanceof BluetoothActivity)) {
@@ -118,23 +136,44 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void showAlertDialog(String title, String message) {
+        showAlertDialog(title, message, null);
+    }
+
+    protected void showAlertDialog(String title, String message, @Nullable Runnable onOk) {
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
-            Log.e("BaseActivity", "showAlertDialog - dialog is already showing");
+            Timber.tag(TAG).e("showAlertDialog - dialog is already showing");
             return;
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                mAlertDialog.dismiss();
+        builder.setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> {
+            mAlertDialog.dismiss();
+            if (onOk != null) {
+                onOk.run();
             }
         });
         mAlertDialog = builder.create();
         mAlertDialog.setCancelable(false);
         mAlertDialog.show();
+    }
+
+    protected void dismissAlertDialog() {
+        runOnUiThread(() -> {
+            if (mAlertDialog == null) {
+                return;
+            }
+
+            try {
+                if (mAlertDialog.isShowing()) {
+                    mAlertDialog.dismiss();
+                }
+            } catch (IllegalArgumentException e) {
+                Timber.tag(TAG).w(e, "Ignoring dialog dismiss after window detachment.");
+            }
+            mAlertDialog = null;
+        });
     }
 
     protected void showAlertDialog(String title, String message, boolean showReceiptOption, TerminalResponse transaction) {
@@ -157,16 +196,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     mAlertDialog.dismiss();
-
-                    //create email intent
-                    Bitmap receipt = ReceiptHelper.createReceiptImage(transaction);
-                    String path = Images.Media.insertImage(getContentResolver(), receipt, "receipt_" + System.currentTimeMillis(), null);
-                    Uri imageUri = Uri.parse(path);
-                    final Intent emailIntent1 = new Intent(android.content.Intent.ACTION_SEND);
-                    emailIntent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    emailIntent1.putExtra(Intent.EXTRA_STREAM, imageUri);
-                    emailIntent1.setType("image/png");
-                    startActivity(Intent.createChooser(emailIntent1, "Send email using"));
+                    showReceiptTypeDialog(transaction);
                 }
             });
         }
@@ -175,8 +205,61 @@ public abstract class BaseActivity extends AppCompatActivity {
         mAlertDialog.show();
     }
 
+    private void showReceiptTypeDialog(final TerminalResponse transaction) {
+        final CharSequence[] receiptOptions = new CharSequence[] {
+                getString(R.string.merchant_receipt),
+                getString(R.string.customer_copy)
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.select_receipt_type))
+                .setItems(receiptOptions, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        sendReceiptEmail(transaction, which == 0);
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        reopenReceiptTypeDialogOnResume = false;
+                        pendingReceiptTransaction = null;
+                    }
+                })
+                .show();
+    }
+
+    private void sendReceiptEmail(TerminalResponse transaction, boolean isMerchantReceipt) {
+        Bitmap receipt = ReceiptHelper.createReceiptImage(transaction, isMerchantReceipt);
+        String path = Images.Media.insertImage(
+                getContentResolver(),
+                receipt,
+                "receipt_" + System.currentTimeMillis(),
+                null);
+        if (path == null) {
+            showAlertDialog(getString(R.string.error), getString(R.string.error_receipt_image_attachment));
+            return;
+        }
+
+        final Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+        emailIntent.setType("image/png");
+        pendingReceiptTransaction = transaction;
+        // Only reopen dialog on first return; after that, stay in email flow
+        if (!isInReceiptEmailFlow) {
+            reopenReceiptTypeDialogOnResume = true;
+            isInReceiptEmailFlow = true;
+        }
+        startActivity(Intent.createChooser(emailIntent, "Send email using"));
+    }
+
     protected void disconnectEvent() {
         //let children activities override if needed
+    }
+
+    protected boolean shouldCloseAfterConnect() {
+        return (this instanceof BluetoothActivity) && connectionMode == ConnectionMode.USB;
     }
 
     protected void hideAlertDialog() {
@@ -191,6 +274,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     final ISelection selectionListener = new ISelection() {
         @Override
+        @SuppressLint("MissingPermission")
         public void onSelection(BluetoothDevice device) {
             try {
                 //Connect the selected device.
@@ -199,8 +283,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 } else {
                     MainActivity.mobyDevice.connect(device);
                 }
-                updateConnectionStatus("Connecting - " + device.getName(),
-                        false);
+                updateConnectionStatus("Connecting - " + device.getName(), false);
             } catch (Exception e) {
                 e.printStackTrace();
                 updateConnectionStatus("An exception occurred.", true);
@@ -210,11 +293,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected DeviceListener mobyDeviceListener = new DeviceListener() {
         @Override
+        @SuppressLint("MissingPermission")
         public void onBluetoothDeviceFound(BluetoothDevice bluetoothDevice) {
             Log.d(TAG, "onBluetoothDeviceFound - " + bluetoothDevice.getName());
         }
 
         @Override
+        @SuppressLint("MissingPermission")
         public void onBluetoothDeviceList(HashSet<BluetoothDevice> deviceList) {
             hideProgress();
             if (deviceList == null || deviceList.isEmpty()) {
@@ -282,7 +367,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                             terminalInfo.getSerialNumber(), Toast.LENGTH_LONG).show();
                     updateConnectionStatus("Connected - " + terminalInfo.getSerialNumber(),
                             false);
-                    finish();
+                    if (shouldCloseAfterConnect()) {
+                        finish();
+                    }
                 }
             });
 
@@ -349,11 +436,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected DeviceListener c2xDeviceListener = new DeviceListener() {
         @Override
+        @SuppressLint("MissingPermission")
         public void onBluetoothDeviceFound(BluetoothDevice bluetoothDevice) {
             Log.d(TAG, "onBluetoothDeviceFound - " + bluetoothDevice.getName());
         }
 
         @Override
+        @SuppressLint("MissingPermission")
         public void onBluetoothDeviceList(final HashSet<BluetoothDevice> deviceList) {
             hideProgress();
             // receive list of available bluetooth devices
@@ -424,7 +513,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                             terminalInfo.getSerialNumber(), Toast.LENGTH_LONG).show();
                     updateConnectionStatus("Connected - " + terminalInfo.getSerialNumber(),
                             false);
-                    finish();
+                    if (shouldCloseAfterConnect()) {
+                        finish();
+                    }
                 }
             });
 
@@ -470,12 +561,74 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     };
 
+    protected DeviceListener usbDeviceListener = new DeviceListener() {
+        @Override
+        public void onBluetoothDeviceFound(BluetoothDevice bluetoothDevice) {
+        }
+
+        @Override
+        public void onBluetoothDeviceList(HashSet<BluetoothDevice> deviceList) {
+        }
+
+        @Override
+        public void onConnected(TerminalInfo terminalInfo) {
+            hideProgress();
+            Log.d(TAG, "onConnected - " + terminalInfo.toString());
+            MainActivity.setPuckTerminalDetails(terminalInfo);
+
+            //update connection status
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Connected - " + terminalInfo.getSerialNumber(), Toast.LENGTH_LONG).show();
+                    updateConnectionStatus("Connected - " + terminalInfo.getSerialNumber(), false);
+                    if (shouldCloseAfterConnect()) {
+                        finish();
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onDisconnected() {
+            Log.d(TAG, "onDisconnected");
+            MainActivity.puck1000Device = null;
+            MainActivity.clearPuckTerminalDetails();
+            //update connection status
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_LONG).show();
+                    updateConnectionStatus("Disconnected", false);
+                    disconnectEvent();
+                }
+            });
+        }
+
+        @Override
+        public void onError(Error error, ErrorType errorType) {
+            Log.e(TAG, "onError - " + error.toString() + ", " + errorType);
+            if (Dialogs.pd != null && Dialogs.pd.isShowing()) {
+                Dialogs.hideProgress();
+            }
+            Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+            //update connection status
+            updateConnectionStatus("Error - " + error.getMessage(), true);
+        }
+
+        @Override
+        public void onTerminalInfoReceived(TerminalInfo terminalInfo) {
+            MainActivity.setPuckTerminalDetails(terminalInfo);
+        }
+    };
+
     protected SafListener safListener = new SafListener() {
         @Override
         public void onProcessingComplete(List<TransactionResponse> responses) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    hideProgress();
                     showAlertDialog(getString(R.string.saf_transactions_complete),
                             Dialogs.constructSAFTransactionMessage(responses));
                 }
@@ -484,12 +637,29 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         @Override
         public void onAllSafTransactionsRetrieved(List<SafTransaction> obfuscatedSafTransactions) {
-
+            if (obfuscatedSafTransactions == null || obfuscatedSafTransactions.isEmpty()) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideProgress();
+                    }
+                });
+            }
         }
 
         @Override
         public void onError(Error error) {
-
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    hideProgress();
+                    String errorMessage = (error != null && error.getMessage() != null
+                            && !error.getMessage().isEmpty())
+                            ? error.getMessage()
+                            : getString(R.string.error);
+                    showAlertDialog(getString(R.string.error), errorMessage);
+                }
+            });
         }
 
         @Override
@@ -512,7 +682,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         @Override
         public void onStoredTransactionComplete(String id, TransactionResponse transactionResponse) {
             //acknowledge the transaction so it can be deleted
-            IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+            IDevice device = getDevice();
             if (transactionResponse.getTransactionResult() != TransactionResultType.CANCELLED) {
                 device.acknowledgeSAFTransaction(id);
             }
@@ -528,4 +698,16 @@ public abstract class BaseActivity extends AppCompatActivity {
             });
         }
     };
+
+    protected IDevice getDevice() {
+        if(MainActivity.c2XDevice != null) {
+            return MainActivity.c2XDevice;
+        } else if (MainActivity.mobyDevice != null) {
+            return MainActivity.mobyDevice;
+        } else if (MainActivity.puck1000Device != null) {
+            return MainActivity.puck1000Device;
+        }else{
+            return null;
+        }
+    }
 }

@@ -4,10 +4,12 @@
 
     <string name="description_credentials">Select this button to set your Portico credentials.</string>
     <string name="enter_credentials">Enter Credentials</string>
-    <string name="description_bluetooth">These options allow you to connect to a C2X or Moby5500 device.</string>
+    <string name="description_bluetooth">These options allow you to connect to a C2X, Moby5500, or PUCK1000 device.</string>
     <string name="connect_to_device">Connect to C2X/C3X (Bluetooth)</string>
     <string name="connect_to_moby_device">Connect to Moby5500 (Bluetooth)</string>
     <string name="connect_to_usbmoby_device">Connect to Moby5500 (USB)</string>
+    <string name="connect_to_usbpuck1000_device">Connect to PUCK1000 (USB)</string>
+    <string name="puck1000_terminal_info">Show PUCK1000 Terminal Info</string>
     <string name="description_card">This option is for testing manual card entry and performing a simple CreditSale transaction with it.</string>
     <string name="card_entry">Manual Card Entry and Transaction</string>
     <string name="description_transactions">Test various transaction types using a connected device. Use one of the top buttons to connect to a device first.</string>
@@ -19,10 +21,21 @@
     <string name="gateway">Gateway Portico/TransIT</string>
     <string name="disconnect">Disconnect</string>
     <string name="saf_switch">SAF Toggle</string>
+    <string name="provisional_switch">Provisional Transaction</string>
+    <string name="mutual_auth_title">Mutual Authentication</string>
+    <string name="mutual_auth_message">Enable Mutual Authentication to secure communication with the PUCK Reader?\n\nNote: The PUCK Reader must be running a firmware version that supports Mutual Authentication.</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    <string name="device_type_label">Device Type:</string>
+    <string-array name="device_type_options">
+        <item>DVT/EVT</item>
+        <item>PVT</item>
+    </string-array>
     <string name="surcharge_switch">Surcharge</string>
     <string name="surcharge_pretax_switch">Surcharge Pre-Tax</string>
     <string name="surcharge_percent_label">Surcharge Percent</string>
     <string name="surcharge_percent_hint">2-3</string>
+    <string name="error_surcharge_percent_range">Surcharge percent must be between 2 and 3</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -38,9 +51,13 @@
     <string name="cancel">Cancel</string>
     <string name="cancel_saf_upload">Cancel SAF Upload</string>
     <string name="email_receipt">Email Receipt</string>
+    <string name="select_receipt_type">Select Receipt Type</string>
+    <string name="merchant_receipt">Merchant Receipt</string>
+    <string name="customer_copy">Customer Copy</string>
     <string name="error_enter_valid_expiration">Make sure to enter a valid number for the expiration month and year.</string>
     <string name="error_enter_valid_card">Make sure to enter valid credit card information.</string>
     <string name="error_device_not_connected">You must connect to your device before using this transaction.</string>
+    <string name="error_castles_device_not_connected">You must connect to your Castles device before using this transaction.</string>
     <string name="error_device_not_connected_ota">You must connect to your device before using OTA updates.</string>
     <string name="error_device_not_supported_rki">Current device does not support RKI.</string>
     <string name="error_no_transaction_id">You must have a valid transaction ID (from CreditSale) to perform this transaction.</string>
@@ -48,6 +65,7 @@
     <string name="error_no_gratuity">You must enter a valid Gratuity Amount.</string>
     <string name="error_credentials_null">You need to enter in your credentials before connecting to a device.</string>
     <string name="error_token_and_id">If using a token, you must include both token and card brand transaction ID.</string>
+    <string name="error_receipt_image_attachment">Unable to attach receipt image to email.</string>
 
     <string name="loading_msg">Please wait</string>
     <string name="tokenizing">Tokenizing&#8230;</string>
@@ -85,24 +103,29 @@
     <string name="tax_amount">Tax amount</string>
     <string name="creditsale_manual">CreditSale - $10 - Manual Entry</string>
     <string name="transaction_list_title">Select a transaction type:</string>
-    <string name="creditsale">CreditSale</string>
+    <string name="creditsale">Credit Sale</string>
     <string name="tipadjust">Tip Adjust</string>
+    <string name="creditincrementalauth">Credit Incremental Auth</string>
     <string name="creditreturn">Credit Return</string>
     <string name="creditvoid">Credit Void</string>
     <string name="creditreversal">Credit Reversal</string>
     <string name="creditadjust">Credit Adjust</string>
     <string name="creditauth">Credit Auth</string>
+    <string name="creditverify">Credit Verify</string>
     <string name="creditcapture">Credit Capture</string>
     <string name="batchclose">Batch Close</string>
     <string name="giftcard">Gift Card</string>
     <string name="uploadsaf">Upload SAF</string>
     <string name="forcesaf_off">Force SAF: Off</string>
     <string name="forcesaf_on">Force SAF: On</string>
+    <string name="test_audio">Test Audio</string>
 
     <string name="checking">Checking</string>
     <string name="check_firmware">Check for firmware updates</string>
     <string name="check_kernel">Check for kernel updates</string>
     <string name="rki">Remote Key Injection</string>
+    <string name="ota_emv">OTA EMV Update</string>
+    <string name="ota_emv_started">OTA EMV update requested.</string>
     <string name="checking_firmware">Checking for available firmware updates</string>
     <string name="checking_kernel">Checking for available kernel updates</string>
 
@@ -119,4 +142,35 @@
     <string name="card_brand_txn_id">Card Brand Txn ID: </string>
     <string name="void_reason">Void Reason: </string>
     <string name="reversal_reason">Reversal Reason: </string>
+    <string name="with_token">Credit sale with token</string>
+    <string name="with_tip">Sale with Tip</string>
+    <string name="error_tip_required">Please enter gratuity amount.</string>
+    <string name="status">Status</string>
+    <string name="select_emv_application">Select EMV application</string>
+    <string name="confirm_surcharge_amount">Confirm Surcharge amount of %s</string>
+    <string name="confirm">Confirm</string>
+    <string name="surcharge_accept">Accept</string>
+    <string name="surcharge_decline">Decline</string>
+    <string name="cdcvm_required_message">Complete verification on the mobile device, then tap Confirm. When prompted, tap the mobile device on the reader again.</string>
+    <string name="prompt_insert_card">Please insert the card correctly.</string>
+    <string name="prompt_tap_card_again">Please tap the card again.</string>
+    <string name="prompt_swipe_card">Please swipe the card.</string>
+    <string name="prompt_upgrade_to_emv">This card has a chip. Please insert the card to complete the transaction.</string>
+    <string name="prompt_tap_or_swipe_card">Please tap or swipe the card.</string>
+    <string name="prompt_try_another_card">Please try another card.</string>
+    <string name="prompt_insert_swipe_or_try_another_card">Please insert, swipe, or try another card.</string>
+    <string name="remove_card">REMOVE CARD</string>
+    <string name="read_card_ok">READ CARD OK</string>
+    <string name="prompt_contactless_payment_failed_try_contact">Contactless payment failed. Please insert or swipe the card.</string>
+    <string name="terminal_info_title">PUCK1000 Terminal Details</string>
+    <string name="terminal_info_type_label">Terminal Type</string>
+    <string name="terminal_info_serial_label">Serial Number</string>
+    <string name="terminal_info_app_name_label">App Name</string>
+    <string name="terminal_info_app_version_label">App Version</string>
+    <string name="terminal_info_firmware_label">Firmware Version</string>
+    <string name="terminal_info_model_label">Model</string>
+    <string name="terminal_info_manufacturer_label">Manufacturer</string>
+    <string name="terminal_info_kernel_label">Kernel Version</string>
+    <string name="terminal_info_battery_level_label">Battery Level</string>
+    <string name="terminal_info_not_available">Not available</string>
 </resources>

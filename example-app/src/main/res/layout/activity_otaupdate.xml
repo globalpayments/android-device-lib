@@ -33,6 +33,14 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/rki" />
 
+        <Button
+            android:id="@+id/ota_emv_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/ota_emv"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </RelativeLayout>

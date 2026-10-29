@@ -15,8 +15,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 41
-        versionName "2.1.9"
+        versionCode 42
+        versionName "2.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -82,16 +82,26 @@ dependencies {
     api project(path: ':vital-sdk:roamreader')
     api project(path: ':vital-sdk:transaction-manager')
     api project(path: ':vital-sdk:database-portico')
-    api project(path: ':vital-sdk:temlibrary')*/
+    api project(path: ':vital-sdk:temlibrary')
+    api project(path: ':vital-sdk:castles-credit')
+    api project(path: ':vital-sdk:castles-payment')
+    api project(path: ':vital-sdk:castles-uldcapapi')
+    api project(path: ':vital-sdk:castles-remotekeyinjection')
+    api project(path: ':vital-sdk:castles-scrp')*/
     api 'com.globalpayments:globalpayments-bbpos:1.0.10'
-    api 'com.globalpayments:globalpayments-core:1.0.23'
+    api 'com.globalpayments:globalpayments-core:1.1.0'
     implementation 'com.globalpayments:globalpayments-ingenico:1.1.1'
-    api 'com.globalpayments:globalpayments-portico:1.0.27'
+    api 'com.globalpayments:globalpayments-portico:1.1.0'
     api 'com.globalpayments:globalpayments-transit:1.0.2'
     api 'com.globalpayments:globalpayments-roamreader:2.6.5.7'
     api 'com.globalpayments:globalpayments-temlibrary:2.6.5.7'
     api 'com.globalpayments:globalpayments-database-portico:1.0.6'
     api 'com.globalpayments:globalpayments-transaction-manager:1.0.29'
+    api 'com.globalpayments:globalpayments-gpone-cc:0.0.16'
+    api 'com.globalpayments:globalpayments-gpone-cp:0.0.16'
+    api 'com.globalpayments:globalpayments-gpone-cu:0.0.01'
+    api 'com.globalpayments:globalpayments-gpone-scrp:1.0.3'
+    api 'com.globalpayments:globalpayments-gpone-rki:1.0.3'
 
     // Apache Commons
     //implementation 'commons-codec:commons-codec:1.13'
@@ -147,6 +157,13 @@ dependencies {
     implementation "androidx.work:work-runtime:$work_version"
     androidTestImplementation "androidx.work:work-runtime:$work_version"
     androidTestImplementation "androidx.work:work-testing:$work_version"
+
+    // This dependency is required for GH27/Puck1000 device for connection.
+    implementation 'com.google.guava:guava:33.7.1-android'
+
+    // BouncyCastle: CSR (PKCS#10) generation for PUCK1000 Mutual Authentication.
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.79'
+    implementation 'org.bouncycastle:bcpkix-jdk15to18:1.79'
 }
 
 import com.vanniktech.maven.publish.SonatypeHost

@@ -25,6 +25,8 @@ public class CreditReturnActivity extends BaseTransactionActivity {
             MainActivity.c2XDevice.setTransactionListener(transactionListener);
         } else if (MainActivity.mobyDevice != null) {
             MainActivity.mobyDevice.setTransactionListener(transactionListener);
+        } else if (MainActivity.puck1000Device != null) {
+            MainActivity.puck1000Device.setTransactionListener(transactionListener);
         }
 
         executeButton.setOnClickListener(new OnClickListener() {
@@ -34,6 +36,9 @@ public class CreditReturnActivity extends BaseTransactionActivity {
                     showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
                     return;
                 } else if(MainActivity.mobyDevice != null && !MainActivity.mobyDevice.isConnected()){
+                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
+                    return;
+                }else if(MainActivity.puck1000Device != null && !MainActivity.puck1000Device.isConnected()){
                     showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
                     return;
                 }
@@ -49,7 +54,7 @@ public class CreditReturnActivity extends BaseTransactionActivity {
                 String clientTransactionId = ((EditText) findViewById(R.id.client_transaction_id)).getText().toString();
                 boolean allowDuplicates = ((CheckBox) findViewById(R.id.creditadjust_allowduplicates)).isChecked();
 
-                IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+                IDevice device = getDevice();
                 CreditReturnBuilder creditReturnBuilder = new CreditReturnBuilder(device);
                 creditReturnBuilder.setAmount(new BigDecimal(amount));
                 if (transactionId != null && !transactionId.isEmpty()) {

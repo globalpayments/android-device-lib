@@ -25,6 +25,8 @@ public class CreditCaptureActivity extends BaseTransactionActivity {
             MainActivity.c2XDevice.setTransactionListener(transactionListener);
         } else if (MainActivity.mobyDevice != null) {
             MainActivity.mobyDevice.setTransactionListener(transactionListener);
+        } else if (MainActivity.puck1000Device != null) {
+            MainActivity.puck1000Device.setTransactionListener(transactionListener);
         }
 
         executeButton.setOnClickListener(new OnClickListener() {
@@ -36,6 +38,11 @@ public class CreditCaptureActivity extends BaseTransactionActivity {
                 } else if(MainActivity.mobyDevice != null && !MainActivity.mobyDevice.isConnected()){
                     showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
                     return;
+                } else if (MainActivity.puck1000Device != null && !MainActivity.puck1000Device.isConnected()) {
+                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
+                    return;
+                } else if (MainActivity.puck1000Device != null) {
+                    MainActivity.puck1000Device.setTransactionListener(transactionListener);
                 }
 
                 String amount = ((EditText) findViewById(R.id.amount)).getText().toString();
@@ -50,7 +57,11 @@ public class CreditCaptureActivity extends BaseTransactionActivity {
                 String clientTransactionId = ((EditText) findViewById(R.id.client_transaction_id)).getText().toString();
                 boolean allowDuplicates = ((CheckBox) findViewById(R.id.creditadjust_allowduplicates)).isChecked();
 
-                IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+                IDevice device = getDevice();
+                if (device == null) {
+                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
+                    return;
+                }
                 CreditCaptureBuilder creditCaptureBuilder = new CreditCaptureBuilder(device);
                 creditCaptureBuilder.setTransactionId(transactionId);
                 if (amount != null && !amount.isEmpty()) {

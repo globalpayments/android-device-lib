@@ -13,23 +13,23 @@ import android.widget.TextView;
 import com.globalpayments.library.terminals.entities.TerminalResponse;
 import com.tsys.payments.library.domain.TransactionResponse;
 import java.util.List;
+import timber.log.Timber;
 
 public class Dialogs {
 
+    private static final String TAG = "Dialogs";
     static AlertDialog pd;
 
     public static AlertDialog showListDialog(final String title, final Context context,
                                              final String[] list,
                                              final DialogInterface.OnClickListener onClickListener) {
-        // LayoutInflater inflater = context.getLayoutInflater();
-        // View dialog = inflater.inflate(R.layout.custom_dialog, null, false);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setCancelable(false);
         builder.setItems(list, onClickListener);
         return builder.show();
     }
+
 
     public static AlertDialog showDialogOK(final Activity context, final String title, String message) {
         LayoutInflater inflater = context.getLayoutInflater();
@@ -47,35 +47,34 @@ public class Dialogs {
 
     public static void showProgress(Activity context, String title, String message,
             View.OnClickListener dialogClickListener) {
-        TextView pdtext;
-        Button pdbutton;
+        showProgress(context, title, message, context.getString(R.string.cancel), dialogClickListener);
+    }
+
+    public static void showProgress(Activity context, String title, String message,
+            String buttonText, View.OnClickListener dialogClickListener) {
         if (pd != null) {
-            try {
-                pd.dismiss();
-            }catch(Throwable e) {
-                e.printStackTrace();
-            }
+            dismissProgressDialog();
             pd = null;
         }
 
-        LayoutInflater inflater = context.getLayoutInflater();
-        View dialog = inflater.inflate(R.layout.progress_dialog, null, false);
+        pd = ProgressDialog.show(context, title, message.replace("_", " "));
+        pd.setContentView(R.layout.progress_dialog);
+        pd.setCancelable(false);
 
-        pdtext = dialog.findViewById(R.id.progress_Dialog_txt);
-        pdtext.setText(message.replace("_", " "));
+        TextView pdText = pd.findViewById(R.id.progress_Dialog_txt);
+        pdText.setText(message.replace("_", " "));
+        Button pdButton = pd.findViewById(R.id.progress_button);
+        pdButton.setText(buttonText);
 
-        pdbutton = dialog.findViewById(R.id.progress_button);
         if (dialogClickListener != null) {
-            pdbutton.setOnClickListener(dialogClickListener);
+            pdButton.setOnClickListener(dialogClickListener);
         } else {
-            pdbutton.setVisibility(View.INVISIBLE);
+            pdButton.setVisibility(View.INVISIBLE);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setView(dialog);
-
-        pd = builder.create();
-        pd.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        if (pd.getWindow() != null) {
+            pd.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
         pd.show();
     }
 
@@ -83,11 +82,7 @@ public class Dialogs {
         TextView pdtext;
         ProgressBar progressBar;
         if (pd != null) {
-            try {
-                pd.dismiss();
-            }catch(Throwable e) {
-                e.printStackTrace();
-            }
+            dismissProgressDialog();
             pd = null;
         }
 
@@ -103,18 +98,42 @@ public class Dialogs {
     }
 
     public static void updateProgress(double percent) {
+        updateProgress(percent, null);
+    }
+
+    public static void updateProgress(Double percent, String message) {
         if (pd == null) {
             return;
         }
         ProgressBar progressBar = pd.findViewById(R.id.progress_bar);
-        progressBar.setProgress((int) percent);
+        if (progressBar != null && percent != null) {
+            progressBar.setProgress((int) Math.round(percent));
+        }
+
+        if (message != null && !message.isEmpty()) {
+            TextView pdtext = pd.findViewById(R.id.progress_Dialog_txt);
+            if (pdtext != null) {
+                pdtext.setText(message.replace("_", " "));
+            }
+        }
     }
 
-    public static void hideProgress(){
-        if(pd != null){
-            pd.dismiss();
-            pd.hide();
+    public static void hideProgress() {
+        if (pd != null) {
+            dismissProgressDialog();
             pd = null;
+        }
+    }
+
+    private static void dismissProgressDialog() {
+        if (pd == null || !pd.isShowing()) {
+            return;
+        }
+
+        try {
+            pd.dismiss();
+        } catch (IllegalArgumentException e) {
+            Timber.tag(TAG).w(e, "Ignoring dialog dismiss after window detachment.");
         }
     }
 
@@ -169,16 +188,16 @@ public class Dialogs {
     }
 
     public static String constructSAFTransactionMessage(List<TransactionResponse> responses) {
-        String message = "";
+        StringBuilder message = new StringBuilder();
 
         for (int i = 0; i < responses.size(); i++) {
-            message += "SAF Item " + (i + 1) + "\n";
-            message += "Device Response Code: " + responses.get(i).getTransactionResult() + "\n";
-            message += "Transaction ID: " + responses.get(i).getGatewayTransactionId() + "\n";
-            message += "Transaction Type: " + responses.get(i).getTransactionType() + "\n";
-            message += "Amount: " + (responses.get(i).getApprovedAmount() != null ? (responses.get(i).getApprovedAmount() / 100f) : null) + "\n\n";
+            message.append("SAF Item ").append(i + 1)
+                    .append("\nDevice Response Code: ").append(responses.get(i).getTransactionResult())
+                    .append("\nTransaction ID: ").append(responses.get(i).getGatewayTransactionId())
+                    .append("\nTransaction Type: ").append(responses.get(i).getTransactionType())
+                    .append("\nAmount: ").append(responses.get(i).getApprovedAmount() != null ? (responses.get(i).getApprovedAmount() / 100f) : null).append("\n\n");
         }
 
-        return message.replace("_", " ");
+        return message.toString().replace("_", " ");
     }
 }

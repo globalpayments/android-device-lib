@@ -64,6 +64,22 @@
                 android:text="@string/connect_to_usbmoby_device" />
 
             <Button
+                android:id="@+id/connect_to_puck1000Usb_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/connect_to_usbpuck1000_device" />
+
+            <Button
+                android:id="@+id/puck1000_terminal_info_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:enabled="false"
+                android:visibility="invisible"
+                android:text="@string/puck1000_terminal_info" />
+
+            <Button
                 android:id="@+id/disconnect_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -129,28 +145,40 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/environment" />
+                android:text="@string/environment"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
 
             <Switch
                 android:id="@+id/gateway_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/gateway" />
+                android:text="@string/gateway"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
 
             <Switch
                 android:id="@+id/saf_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/saf_switch" />
+                android:text="@string/saf_switch"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            <Switch
+                android:id="@+id/provisional_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/provisional_switch"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
 
             <Switch
                 android:id="@+id/surcharge_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/surcharge_switch" />
+                android:text="@string/surcharge_switch"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
 
             <Switch
                 android:id="@+id/surcharge_pretax_switch"

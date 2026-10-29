@@ -13,6 +13,46 @@ public class CredentialsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_credentials);
+        //load saved credentials, if they exist
+        SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.SAVED_PREFS, MODE_PRIVATE);
+        String savedPublicKey = sharedPreferences.getString(MainActivity.SAVED_PUBLIC_KEY, null);
+        String savedUsername = sharedPreferences.getString(MainActivity.SAVED_USERNAME, null);
+        String savedPassword = sharedPreferences.getString(MainActivity.SAVED_PASSWORD, null);
+        String savedSiteId = sharedPreferences.getString(MainActivity.SAVED_SITE_ID, null);
+        String savedDeviceId = sharedPreferences.getString(MainActivity.SAVED_DEVICE_ID, null);
+        String savedLicenseId = sharedPreferences.getString(MainActivity.SAVED_LICENSE_ID, null);
+        String savedMerchantId = sharedPreferences.getString(MainActivity.SAVED_MERCHANT_ID, null);
+        String savedDeveloperId = sharedPreferences.getString(MainActivity.SAVED_DEVELOPER_ID, null);
+        String savedTransactionKey = sharedPreferences.getString(MainActivity.SAVED_TRANSACTION_KEY, null);
+
+        //set the saved values to the fields
+        if (savedPublicKey != null) {
+            ((EditText) findViewById(R.id.public_key)).setText(savedPublicKey);
+        }
+        if (savedUsername != null) {
+            ((EditText) findViewById(R.id.username)).setText(savedUsername);
+        }
+        if (savedPassword != null) {
+            ((EditText) findViewById(R.id.password)).setText(savedPassword);
+        }
+        if (savedSiteId != null) {
+            ((EditText) findViewById(R.id.site_id)).setText(savedSiteId);
+        }
+        if (savedDeviceId != null) {
+            ((EditText) findViewById(R.id.device_id)).setText(savedDeviceId);
+        }
+        if (savedLicenseId != null) {
+            ((EditText) findViewById(R.id.license_id)).setText(savedLicenseId);
+        }
+        if (savedMerchantId != null) {
+            ((EditText) findViewById(R.id.merchant_id)).setText(savedMerchantId);
+        }
+        if (savedDeveloperId != null) {
+            ((EditText) findViewById(R.id.developer_id)).setText(savedDeveloperId);
+        }
+        if (savedTransactionKey != null) {
+            ((EditText) findViewById(R.id.transaction_key)).setText(savedTransactionKey);
+        }
 
         findViewById(R.id.save_button).setOnClickListener(new OnClickListener() {
             @Override

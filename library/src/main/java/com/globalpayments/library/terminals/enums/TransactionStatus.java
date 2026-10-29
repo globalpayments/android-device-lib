@@ -35,7 +35,9 @@ public enum TransactionStatus {
     TAP_SWIPE_CARD,
     INSERT_SWIPE_OR_TRY_ANOTHER_CARD,
     //End of New Status
-    PROCESSING;
+    PROCESSING,
+    /** A cancellation was requested and is being processed. No further status updates follow. */
+    CANCELLING;
 
     public static TransactionStatus fromVitalSdk(com.tsys.payments.library.enums.TransactionStatus status) {
         Timber.d("FromVitalSDK called with status = [%s]", status);

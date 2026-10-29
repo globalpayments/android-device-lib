@@ -2,6 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2026-10-28
+ 
+### Added
+- Added support for the Puck 1000 (GH27) terminal (Credit Sale, Credit Auth, Credit Incremental Auth, Credit Capture, Credit Adjust, Credit Return, Credit Reversal, Credit Void, Credit Verify, Batch Close, Surcharge and SAF).
+- Added support for mutual authentication where puck FW25 and above is required 
+
+### Changed
+- Updated `globalpayments-core` and `globalpayments-portico` to 1.1.0.
+
 ## [2.1.9] - 2026-10-21
  
 ### Added

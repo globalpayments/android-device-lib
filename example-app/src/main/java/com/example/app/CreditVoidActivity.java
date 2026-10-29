@@ -27,6 +27,8 @@ public class CreditVoidActivity extends BaseTransactionActivity {
             MainActivity.c2XDevice.setTransactionListener(transactionListener);
         } else if (MainActivity.mobyDevice != null) {
             MainActivity.mobyDevice.setTransactionListener(transactionListener);
+        } else if (MainActivity.puck1000Device != null) {
+            MainActivity.puck1000Device.setTransactionListener(transactionListener);
         }
 
         Spinner voidReasonSpinner = findViewById(R.id.creditvoid_voidreason);
@@ -42,6 +44,9 @@ public class CreditVoidActivity extends BaseTransactionActivity {
                 } else if(MainActivity.mobyDevice != null && !MainActivity.mobyDevice.isConnected()){
                     showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
                     return;
+                } else if(MainActivity.puck1000Device != null && !MainActivity.puck1000Device.isConnected()){
+                    showAlertDialog(getString(R.string.error), getString(R.string.error_device_not_connected));
+                    return;
                 }
 
                 String transactionId = ((EditText) findViewById(R.id.transaction_id)).getText().toString();
@@ -54,14 +59,13 @@ public class CreditVoidActivity extends BaseTransactionActivity {
                 String clientTransactionId = ((EditText) findViewById(R.id.client_transaction_id)).getText().toString();
                 boolean allowDuplicates = ((CheckBox) findViewById(R.id.creditvoid_allowduplicates)).isChecked();
                 ReversalReason reversalReason = ReversalReason.values()[((Spinner) findViewById(R.id.creditvoid_voidreason)).getSelectedItemPosition()];
-
-                IDevice device = MainActivity.c2XDevice != null ? MainActivity.c2XDevice : MainActivity.mobyDevice;
+                IDevice device = getDevice();
                 CreditVoidBuilder creditVoidBuilder = new CreditVoidBuilder(device);
+                creditVoidBuilder.setReversalReason(reversalReason);
                 creditVoidBuilder.setTransactionId(transactionId);
                 if (clientTransactionId != null) {
                     creditVoidBuilder.setReferenceNumber(clientTransactionId);
                 }
-                creditVoidBuilder.setReversalReason(reversalReason);
                 creditVoidBuilder.setAllowDuplicates(allowDuplicates);
                 try {
                     creditVoidBuilder.execute();
